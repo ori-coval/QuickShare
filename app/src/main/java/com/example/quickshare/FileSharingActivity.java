@@ -5,10 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 public class FileSharingActivity extends Activity {
 
@@ -97,4 +101,22 @@ public class FileSharingActivity extends Activity {
         startActivityForResult(intent, requestCode);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_share_screen){
+            finish();
+        }
+
+        if( id == R.id.action_home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
