@@ -47,7 +47,8 @@ public class RecipientActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish(); // Close the File Sharing Activity
+                Intent intent = new Intent(RecipientActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -55,8 +56,8 @@ public class RecipientActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem homeAction = menu.findItem(R.id.action_home);
-        homeAction.setVisible(false);
+        MenuItem recipientAction = menu.findItem(R.id.action_recipient);
+        recipientAction.setVisible(false);
         return true;
     }
 
@@ -64,8 +65,17 @@ public class RecipientActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.action_share_screen){
-            finish();
+        if(id == R.id.action_home){
+            Intent intent = new Intent(RecipientActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
+        else if(id == R.id.action_share_screen){
+            Intent intent = new Intent(RecipientActivity.this, FileSharingActivity.class);
+            startActivity(intent);
+        }
+        else if(id == R.id.action_history){
+            Intent intent = new Intent(RecipientActivity.this, SharedFilesHistoryActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

@@ -8,8 +8,18 @@
 
     <item
         android:id="@+id/action_share_screen"
-        android:title="Share"
+        android:title="Share file"
         android:icon="@drawable/share_svg"
+        />
+
+    <item
+        android:id="@+id/action_recipient"
+        android:title="Receive file"
+        />
+
+    <item
+        android:id="@+id/action_history"
+        android:title="Share history"
         />
 
 </menu>

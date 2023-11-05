@@ -100,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, FileSharingActivity.class);
             startActivity(intent);
         }
+        else if(id == R.id.action_recipient){
+            Intent intent = new Intent(MainActivity.this, RecipientActivity.class);
+            startActivity(intent);
+        }
+        else if(id == R.id.action_history){
+            Intent intent = new Intent(MainActivity.this, SharedFilesHistoryActivity.class);
+            startActivity(intent);
+        }
         return super.onOptionsItemSelected(item);
     }
 }
