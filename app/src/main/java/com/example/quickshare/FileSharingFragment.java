@@ -1,21 +1,23 @@
 package com.example.quickshare;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Activity;
-import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-public class FileSharingActivity extends AppCompatActivity {
+public class FileSharingFragment extends Fragment {
 
     private Button selectFileButton;
     private Button viaBluetoothButton;
@@ -26,19 +28,18 @@ public class FileSharingActivity extends AppCompatActivity {
     Context context;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_sharing);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_file_sharing, container, false);
 
-        context = getApplicationContext();
+        context = requireContext();
 
         // Initialize UI elements
-        selectFileButton = findViewById(R.id.select_file_button);
-        viaBluetoothButton = findViewById(R.id.via_bluetooth_button);
-        viaNfcButton = findViewById(R.id.via_nfc_button);
-        sendFileButton = findViewById(R.id.send_file_button);
-        cancelButton = findViewById(R.id.cancel_button);
-        progressBar = findViewById(R.id.progress_bar);
+        selectFileButton = view.findViewById(R.id.select_file_button);
+        viaBluetoothButton = view.findViewById(R.id.via_bluetooth_button);
+        viaNfcButton = view.findViewById(R.id.via_nfc_button);
+        sendFileButton = view.findViewById(R.id.send_file_button);
+        cancelButton = view.findViewById(R.id.cancel_button);
+        progressBar = view.findViewById(R.id.progress_bar);
 
         // Set initial button states
         sendFileButton.setEnabled(false);
@@ -76,37 +77,15 @@ public class FileSharingActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(FileSharingActivity.this, MainActivity.class);
+                Intent intent = new Intent(requireActivity(), MainActivity.class);
                 startActivity(intent);
             }
         });
+
+        return view;
     }
 
-        @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem shareFileAction = menu.findItem(R.id.action_share_screen);
-        shareFileAction.setVisible(false);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.action_home){
-            Intent intent = new Intent(FileSharingActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
-        else if(id == R.id.action_recipient){
-            Intent intent = new Intent(FileSharingActivity.this, RecipientActivity.class);
-            startActivity(intent);
-        }
-        else if(id == R.id.action_history){
-            Intent intent = new Intent(FileSharingActivity.this, SharedFilesHistoryActivity.class);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
+    // Rest of the code remains the same
 
     // Add additional methods and logic as needed for file selection, recipient handling, and file sharing.
 
@@ -128,5 +107,4 @@ public class FileSharingActivity extends AppCompatActivity {
         intent.setType("*/*");
         startActivityForResult(intent, requestCode);
     }
-
 }

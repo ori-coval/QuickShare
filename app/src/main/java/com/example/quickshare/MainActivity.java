@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -19,14 +21,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button sharedFilesButton;
     private Button sendFileButton;
     private Button receiveFileButton;
     private BluetoothAdapter bluetoothAdapter;
 
+    private RecyclerView recyclerView;
+    private TextView empty;
+    private SharedFilesAdapter adapter;
+    private List<SharedFile> sharedFiles;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         }
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
-        sharedFilesButton = findViewById(R.id.shared_files_button);
         sendFileButton = findViewById(R.id.send_file_button);
         receiveFileButton = findViewById(R.id.receive_file_button);
 
@@ -51,32 +59,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Start the File Sharing Activity
-                Intent intent = new Intent(MainActivity.this, FileSharingActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Set a click listener for the "receive File" button
-        receiveFileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Start the File Sharing Activity
-                Intent intent = new Intent(MainActivity.this, RecipientActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Set a click listener for the "Shared Files" button
-        sharedFilesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Start the Shared Files Activity
-                Intent intent = new Intent(MainActivity.this, SharedFilesHistoryActivity.class);
+                Intent intent = new Intent(MainActivity.this, SendReciveFileActivity.class);
                 startActivity(intent);
             }
         });
 
 
+        // Initialize the RecyclerView
+        recyclerView = findViewById(R.id.shared_files_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        empty = findViewById(R.id.empty_state_message);
+
+        // Initialize the adapter and set it to the RecyclerView
+        sharedFiles = getSharedFilesData(); // Implement this method to load shared files data
+        adapter = new SharedFilesAdapter(sharedFiles);
+        recyclerView.setAdapter(adapter);
+
+        if(sharedFiles.isEmpty()){
+            empty.setVisibility(View.VISIBLE);
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -97,17 +98,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.action_share_screen){
-            Intent intent = new Intent(MainActivity.this, FileSharingActivity.class);
-            startActivity(intent);
-        }
-        else if(id == R.id.action_recipient){
-            Intent intent = new Intent(MainActivity.this, RecipientActivity.class);
-            startActivity(intent);
-        }
-        else if(id == R.id.action_history){
-            Intent intent = new Intent(MainActivity.this, SharedFilesHistoryActivity.class);
+            Intent intent = new Intent(MainActivity.this, SendReciveFileActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // Implement a method to load shared files data
+    private List<SharedFile> getSharedFilesData() {
+        // Implement this method to retrieve and return a list of shared files
+        // Replace this with your actual data retrieval logic.
+
+        ArrayList<SharedFile> test = new ArrayList<>();
+        test.add(new SharedFile("Test","Test","Test","Test","Test"));
+        test.add(new SharedFile("Test","Test","Test","Test","Test"));
+        return test;
     }
 }

@@ -1,13 +1,13 @@
 package com.example.quickshare;
 
-public class SharedFileHistory {
+public class SharedFile {
     private String fileName;
     private String fileType;
     private String recipient;
     private String date;
     private String filePath; // Add the file path property
 
-    public SharedFileHistory(String fileName, String fileType, String recipient, String date, String filePath) {
+    public SharedFile(String fileName, String fileType, String recipient, String date, String filePath) {
         this.fileName = fileName;
         this.fileType = fileType;
         this.recipient = recipient;

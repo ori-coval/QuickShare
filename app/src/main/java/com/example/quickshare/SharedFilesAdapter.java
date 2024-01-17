@@ -11,9 +11,9 @@ import java.util.List;
 
 public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.SharedFileViewHolder> {
 
-    private List<SharedFileHistory> sharedFiles;
+    private List<SharedFile> sharedFiles;
 
-    public SharedFilesAdapter(List<SharedFileHistory> sharedFiles) {
+    public SharedFilesAdapter(List<SharedFile> sharedFiles) {
         this.sharedFiles = sharedFiles;
     }
 
@@ -27,7 +27,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull SharedFileViewHolder holder, int position) {
-        SharedFileHistory sharedFile = sharedFiles.get(position);
+        SharedFile sharedFile = sharedFiles.get(position);
         holder.textFileName.setText(sharedFile.getFileName());
         holder.textFileType.setText(sharedFile.getFileType());
         holder.textRecipient.setText(sharedFile.getRecipient());

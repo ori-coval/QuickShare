@@ -36,7 +36,7 @@
         android:layout_marginTop="16dp"
         android:id="@+id/send_file_button" />
 
-    <!-- Shared Files Button -->
+    <!-- receive Files Button -->
     <Button
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -44,15 +44,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
         android:id="@+id/receive_file_button" />
-
-    <!-- Shared Files Button -->
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="Shared Files"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:id="@+id/shared_files_button" />
 
     <!-- How to Use Section -->
     <TextView
@@ -79,5 +70,34 @@
         android:layout_height="wrap_content"
         android:text="3. Click 'receive Files' to receive a file."
         android:textSize="14sp" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Shared Files History"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:padding="16dp" />
+
+    <!-- RecyclerView for Shared Files -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shared_files_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/textTitle" />
+
+    <!-- Empty State Message -->
+    <TextView
+        android:id="@+id/empty_state_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No shared files found"
+        android:textSize="25dp"
+        android:layout_marginTop="220dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
 
 </LinearLayout>
