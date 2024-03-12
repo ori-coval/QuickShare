@@ -23,6 +23,10 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.TextView;
 
+import com.example.quickshare.shareReceiveFile.SendReceiveFileActivity;
+import com.example.quickshare.sharedFiles.SharedFile;
+import com.example.quickshare.sharedFiles.SharedFilesAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +63,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Start the File Sharing Activity
-                Intent intent = new Intent(MainActivity.this, SendReciveFileActivity.class);
-                startActivity(intent);
+                Intent sendFileIntent = new Intent(MainActivity.this, SendReceiveFileActivity.class);
+                sendFileIntent.putExtra("default_fragment", CONSTANTS.SEND_FILE_POSE);
+                startActivity(sendFileIntent);
+            }
+        });
+
+
+        // Set a click listener for the "Send File" button
+        receiveFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Start the File Sharing Activity
+                Intent receiveFileIntent = new Intent(MainActivity.this, SendReceiveFileActivity.class);
+                receiveFileIntent.putExtra("default_fragment", CONSTANTS.RECEIVE_FILE_POSE);
+                startActivity(receiveFileIntent);
             }
         });
 
@@ -98,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.action_share_screen){
-            Intent intent = new Intent(MainActivity.this, SendReciveFileActivity.class);
+            Intent intent = new Intent(MainActivity.this, SendReceiveFileActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

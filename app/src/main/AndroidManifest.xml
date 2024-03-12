@@ -29,17 +29,10 @@
         android:theme="@style/Theme.QuickShare"
         tools:targetApi="31">
         <activity
-            android:name=".SendReciveFileActivity"
+            android:name=".shareReceiveFile.SendReceiveFileActivity"
             android:exported="false" />
-        <activity
-            android:name=".RecipientActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SharedFilesHistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".FileSharingActivity"
-            android:exported="false" />
+        <activity android:name=".DeviceListActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

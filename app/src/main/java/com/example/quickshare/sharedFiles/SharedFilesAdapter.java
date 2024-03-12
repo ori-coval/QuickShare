@@ -1,4 +1,4 @@
-package com.example.quickshare;
+package com.example.quickshare.sharedFiles;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,11 +7,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.quickshare.R;
+
 import java.util.List;
 
 public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.SharedFileViewHolder> {
 
-    private List<SharedFile> sharedFiles;
+    private final List<SharedFile> sharedFiles;
 
     public SharedFilesAdapter(List<SharedFile> sharedFiles) {
         this.sharedFiles = sharedFiles;

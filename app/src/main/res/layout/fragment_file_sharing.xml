@@ -7,16 +7,6 @@
     android:background="@color/LightGray"
     android:padding="16dp">
 
-    <!-- App Title -->
-    <!--    <TextView-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="center_horizontal"-->
-    <!--        android:text="QuickShare - Nearby File Sharing"-->
-    <!--        android:textSize="18sp"-->
-    <!--        android:textStyle="bold"-->
-    <!--        android:layout_marginBottom="16dp"/>-->
-
     <!-- Select File Button -->
     <Button
         android:layout_width="match_parent"
@@ -27,6 +17,7 @@
 
     <!-- Selected File Info -->
     <TextView
+        android:id="@+id/TV_file_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Selected File: [File Name] (Size: [File Size], Type: [File Type])"
