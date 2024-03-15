@@ -46,6 +46,11 @@ import java.util.Set;
 public class DeviceListActivity extends Activity {
 
     /**
+     * Tag for Log
+     */
+    private static final String TAG = "DeviceListActivity";
+
+    /**
      * Return Intent extra
      */
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -73,9 +78,11 @@ public class DeviceListActivity extends Activity {
 
         // Initialize the button to perform device discovery
         Button scanButton = findViewById(R.id.button_scan);
-        scanButton.setOnClickListener(v -> {
-            doDiscovery();
-            v.setVisibility(View.GONE);
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                doDiscovery();
+                v.setVisibility(View.GONE);
+            }
         });
 
         // Initialize array adapters. One for already paired devices and
@@ -187,7 +194,7 @@ public class DeviceListActivity extends Activity {
     /**
      * The on-click listener for all devices in the ListViews
      */
-    private final AdapterView.OnItemClickListener mDeviceClickListener
+    private AdapterView.OnItemClickListener mDeviceClickListener
             = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
             // Cancel discovery because it's costly and we're about to connect

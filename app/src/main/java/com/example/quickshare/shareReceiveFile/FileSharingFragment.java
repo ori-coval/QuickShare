@@ -36,6 +36,7 @@ import com.example.quickshare.sharedFiles.SharedFile;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class FileSharingFragment extends Fragment {
@@ -87,24 +88,14 @@ public class FileSharingFragment extends Fragment {
         // Initialize Activity Result Launcher
         bluetoothConnectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            if (data != null) {
-                                connectDevice(data);
-                                if(connectThread.isAlive()&&hasFile){
-                                    // variable for simple date format.
-                                    SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy'");// '\n\nand\n\nTime\n'HH:mm:ss z");
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                            connectDevice(data);
+                            if(connectThread.isAlive()&&hasFile){
 
-                                    // on below line we are creating a variable
-                                    // for current date and time and calling a simple date format in it.
-                                    String currentDateAndTime = sdf.format(new Date());
-                                    SharedFile file = new SharedFile(filePath,fileType,currentDateAndTime,fileSize);
-                                }
+                                SharedFile file = new SharedFile(filePath,fileType, LocalDate.now().toString(),fileSize);
                             }
-                        }
                     }
                 });
 
