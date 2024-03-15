@@ -1,6 +1,7 @@
 package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.quickshare.CONSTANTS;
+import com.example.quickshare.DeviceListActivity;
 import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 import com.example.quickshare.sharedFiles.SharedFile;
@@ -189,6 +191,7 @@ public class FileSharingFragment extends Fragment {
     }
 
 
+    @SuppressLint("MissingPermission")
     private class ConnectThread extends Thread {
         public BluetoothSocket mmSocket;
 

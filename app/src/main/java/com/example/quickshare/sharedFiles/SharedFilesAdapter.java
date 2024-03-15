@@ -33,7 +33,6 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         SharedFile sharedFile = sharedFiles.get(position);
         holder.textFileName.setText(sharedFile.getFilePath());
         holder.textFileType.setText(sharedFile.getFileType());
-        holder.textRecipient.setText(sharedFile.getRecipient());
         holder.textDate.setText(sharedFile.getDate());
 
         // Implement click listeners for buttons

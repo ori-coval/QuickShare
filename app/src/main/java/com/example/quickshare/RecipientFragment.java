@@ -1,4 +1,4 @@
-package com.example.quickshare.shareReceiveFile;
+package com.example.quickshare;
 
 import android.content.Intent;
 import android.os.Bundle;

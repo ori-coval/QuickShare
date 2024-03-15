@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.quickshare.shareReceiveFile;
+package com.example.quickshare;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -34,8 +34,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
-
-import com.example.quickshare.R;
 
 import java.util.Set;
 
