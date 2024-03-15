@@ -1,7 +1,6 @@
 package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -29,22 +28,27 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.DeviceListActivity;
 import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
+import com.example.quickshare.sharedFiles.SharedFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FileSharingFragment extends Fragment {
     private TextView selectedFileInfo;
     private Uri selectedFileUri;
     private Context context;
-
     private ActivityResultLauncher<String> fileSelectionLauncher;
     private ActivityResultLauncher<Intent> bluetoothConnectLauncher;
     private BluetoothAdapter bluetoothAdapter;
     private ConnectThread connectThread;
     private static BluetoothSocket socket;
+    private boolean hasFile = false;
+    private String fileType;
+    private String fileSize;
+    private String filePath;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,6 +92,15 @@ public class FileSharingFragment extends Fragment {
                             Intent data = result.getData();
                             if (data != null) {
                                 connectDevice(data);
+                                if(connectThread.isAlive()&&hasFile){
+                                    // variable for simple date format.
+                                    SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy'");// '\n\nand\n\nTime\n'HH:mm:ss z");
+
+                                    // on below line we are creating a variable
+                                    // for current date and time and calling a simple date format in it.
+                                    String currentDateAndTime = sdf.format(new Date());
+                                    SharedFile file = new SharedFile(filePath,fileType,currentDateAndTime,fileSize);
+                                }
                             }
                         }
                     }
@@ -104,6 +117,8 @@ public class FileSharingFragment extends Fragment {
 
         sendFileButton.setOnClickListener(view14 -> {
             //TODO: Implement file sharing logic
+
+
         });
 
         cancelButton.setOnClickListener(view15 -> {
@@ -139,9 +154,9 @@ public class FileSharingFragment extends Fragment {
         int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
         returnCursor.moveToFirst();
 
-        String filePath = returnCursor.getString(nameIndex);
-        String fileSize = String.format("%.3f",returnCursor.getDouble(sizeIndex)/1000000) + " MB";
-        String fileType = getActivity().getContentResolver().getType(fileUri);
+        filePath = returnCursor.getString(nameIndex);
+        fileSize = String.format("%.3f",returnCursor.getDouble(sizeIndex)/1000000) + " MB";
+        fileType = getActivity().getContentResolver().getType(fileUri);
         int index = 0;
         if (fileType != null) {
             index = fileType.indexOf('/');
@@ -150,6 +165,7 @@ public class FileSharingFragment extends Fragment {
 
         // Construct the file info text
         String fileInfoText = "Selected File: " + filePath + " (Size: " + fileSize + ", Type: " + fileType + ")";
+        hasFile = true;
 
         selectedFileInfo.setText(fileInfoText);
 

@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
         // Replace this with your actual data retrieval logic.
 
         ArrayList<SharedFile> test = new ArrayList<>();
-        test.add(new SharedFile("Test","Test","Test","Test","Test"));
-        test.add(new SharedFile("Test","Test","Test","Test","Test"));
+        test.add(new SharedFile("Test","Test","Test","Test"));
         return test;
     }
 }
