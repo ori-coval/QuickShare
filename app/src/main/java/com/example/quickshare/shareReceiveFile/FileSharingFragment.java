@@ -100,7 +100,8 @@ public class FileSharingFragment extends Fragment {
                 });
 
         viaBluetoothButton.setOnClickListener(view12 -> {
-            Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+            Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
+            startActivityForResult(serverIntent,2);
             bluetoothConnectLauncher.launch(serverIntent);
         });
 
