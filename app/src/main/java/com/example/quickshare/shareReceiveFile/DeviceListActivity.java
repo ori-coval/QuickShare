@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.quickshare;
+package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
 import android.app.Activity;
@@ -35,6 +35,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
+
+import com.example.quickshare.R;
 
 import java.util.Set;
 
