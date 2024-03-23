@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.example.quickshare.sharedFiles.SharedFile;
 
+import java.util.ArrayList;
+
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "shared_files.db";
@@ -15,7 +17,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_NAME = "shared_files_table";
 
-    public static final String COL_ID = "ID";
+    // Remove COL_ID constant
+
     public static final String COL_FILE_PATH = "FILE_PATH";
     public static final String COL_FILE_TYPE = "FILE_TYPE";
     public static final String COL_DATE = "DATE";
@@ -27,7 +30,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_FILE_PATH + " TEXT, " + COL_FILE_TYPE + " TEXT, " + COL_DATE + " TEXT, " + COL_FILE_SIZE + " TEXT);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COL_FILE_PATH + " TEXT PRIMARY KEY, " + COL_FILE_TYPE + " TEXT, " + COL_DATE + " TEXT, " + COL_FILE_SIZE + " TEXT);");
     }
 
     @Override
@@ -43,7 +46,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_FILE_TYPE, sharedFile.getFileType());
         contentValues.put(COL_DATE, sharedFile.getDate());
         contentValues.put(COL_FILE_SIZE, sharedFile.getFileSize());
-        long result = db.insert(TABLE_NAME, null, contentValues);
+        long result = db.insertWithOnConflict(TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         return result != -1;
     }
 
@@ -51,13 +54,32 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
     }
+
+    public ArrayList<SharedFile> getAllSharedFilesList() {
+        ArrayList<SharedFile> sharedFilesList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        try {
+            while (cursor.moveToNext()) {
+                String filePath = cursor.getString(cursor.getColumnIndexOrThrow(COL_FILE_PATH));
+                String fileType = cursor.getString(cursor.getColumnIndexOrThrow(COL_FILE_TYPE));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COL_DATE));
+                String fileSize = cursor.getString(cursor.getColumnIndexOrThrow(COL_FILE_SIZE));
+                SharedFile sharedFile = new SharedFile(filePath, fileType, date, fileSize);
+                sharedFilesList.add(sharedFile);
+            }
+        } finally {
+            cursor.close();
+        }
+        return sharedFilesList;
+    }
+
     @SuppressLint("Range")
-    public SharedFile getSharedFileById(int fileId) {
+    public SharedFile getSharedFileByPath(String filePath) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ?", new String[]{String.valueOf(fileId)});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_FILE_PATH + " = ?", new String[]{filePath});
         SharedFile sharedFile = null;
         if (cursor.moveToFirst()) {
-            String filePath = cursor.getString(cursor.getColumnIndex(COL_FILE_PATH));
             String fileType = cursor.getString(cursor.getColumnIndex(COL_FILE_TYPE));
             String date = cursor.getString(cursor.getColumnIndex(COL_DATE));
             String fileSize = cursor.getString(cursor.getColumnIndex(COL_FILE_SIZE));
@@ -67,8 +89,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return sharedFile;
     }
 
-    public boolean deleteSharedFile(int fileId) {
+    public boolean deleteSharedFile(String filePath) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(fileId)}) > 0;
+        return db.delete(TABLE_NAME, COL_FILE_PATH + " = ?", new String[]{filePath}) > 0;
     }
 }

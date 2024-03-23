@@ -15,5 +15,8 @@ public class CONSTANTS {
         public static final int MESSAGE_READ = 0;
         public static final int MESSAGE_WRITE = 1;
         public static final int MESSAGE_TOAST = 2;
+        int MESSAGE_PROGRESS = 564564;
+        int MESSAGE_READ_FILE = 4589;
+        int MESSAGE_FILE_RECEIVED = 897456;
     }
 }

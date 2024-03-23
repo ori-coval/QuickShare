@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.quickshare"
-        minSdk = 30
+        minSdk = 31
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -39,4 +39,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation ("org.apache.tika:tika-core:1.27")
 }

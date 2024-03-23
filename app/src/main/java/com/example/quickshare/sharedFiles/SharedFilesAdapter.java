@@ -1,5 +1,9 @@
 package com.example.quickshare.sharedFiles;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,16 +12,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quickshare.CONSTANTS;
+import com.example.quickshare.DB.DataBaseHelper;
+import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
+import com.example.quickshare.shareReceiveFile.SendReceiveFileActivity;
 
 import java.util.List;
 
 public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.SharedFileViewHolder> {
 
     private final List<SharedFile> sharedFiles;
+    private DataBaseHelper dataBaseHelper;
+    Context context;
 
-    public SharedFilesAdapter(List<SharedFile> sharedFiles) {
+    public SharedFilesAdapter(List<SharedFile> sharedFiles, Context context) {
+        this.context = context;
         this.sharedFiles = sharedFiles;
+        dataBaseHelper = new DataBaseHelper(context);
     }
 
     @NonNull
@@ -39,17 +51,29 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Implement the logic for deleting the shared file
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    dataBaseHelper.deleteSharedFile(sharedFiles.get(adapterPosition).getFilePath());
+                    sharedFiles.remove(adapterPosition);
+                    notifyDataSetChanged(); // Refresh the RecyclerView
+                }
             }
         });
 
         holder.shareAgainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Implement the logic for sharing the file again
+                // Start the File Sharing Activity
+                Intent sendFileIntent = new Intent(context, SendReceiveFileActivity.class);
+                sendFileIntent.putExtra("default_fragment", CONSTANTS.SEND_FILE_POSE);
+                sendFileIntent.putExtra("file_path", sharedFile.getFilePath());
+                sendFileIntent.putExtra("file_type", sharedFile.getFileType());
+                sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
+                startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
             }
         });
     }
+
 
     @Override
     public int getItemCount() {

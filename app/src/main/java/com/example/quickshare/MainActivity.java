@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.TextView;
 
+import com.example.quickshare.DB.DataBaseHelper;
 import com.example.quickshare.shareReceiveFile.SendReceiveFileActivity;
 import com.example.quickshare.sharedFiles.SharedFile;
 import com.example.quickshare.sharedFiles.SharedFilesAdapter;
@@ -43,10 +44,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView empty;
     private SharedFilesAdapter adapter;
     private List<SharedFile> sharedFiles;
+    private DataBaseHelper dataBaseHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dataBaseHelper = new DataBaseHelper(this);
 
         if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT)== PackageManager.PERMISSION_DENIED){
             if(Build.VERSION.SDK_INT>=31){
@@ -84,15 +88,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        dataBaseHelper.insertSharedFile(new SharedFile("Test","Test", LocalDate.now().toString(),"Test"));//TODO: Remove this
         // Initialize the RecyclerView
         recyclerView = findViewById(R.id.shared_files_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         empty = findViewById(R.id.empty_state_message);
 
         // Initialize the adapter and set it to the RecyclerView
-        sharedFiles = getSharedFilesData(); // Implement this method to load shared files data
-        adapter = new SharedFilesAdapter(sharedFiles);
+        sharedFiles = dataBaseHelper.getAllSharedFilesList(); // Implement this method to load shared files data
+        adapter = new SharedFilesAdapter(sharedFiles, this);
         recyclerView.setAdapter(adapter);
 
         if(sharedFiles.isEmpty()){

@@ -1,66 +1,116 @@
 package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.quickshare.Bluetooth.ConnectedThread;
 import com.example.quickshare.CONSTANTS;
+import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
 
 public class RecipientFragment extends Fragment {
 
-    private Button cancelButton;
     private BluetoothAdapter bluetoothAdapter;
     private AcceptThread acceptThread;
-    private Handler handler = new Handler();
-    private ConnectedThread connectedThread;
-    private static TextView textView;
+    private TextView textView;
+    private Handler handler;
 
+    byte[] data;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipient, container, false);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case CONSTANTS.MessageConstants.MESSAGE_FILE_RECEIVED:
+                        data = (byte[]) msg.obj;
+                        return true;
+                    case CONSTANTS.MessageConstants.MESSAGE_READ_FILE:
+                        // Handle the read file message
+                        textView.setText(msg.obj.toString());
+                        return true;
+                }
+                return false;
+            }
+        });
 
-        cancelButton = view.findViewById(R.id.cancel_button);
+        Button cancelButton = view.findViewById(R.id.cancel_button);
         textView = view.findViewById(R.id.textView1);
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        acceptThread = new AcceptThread((RecipientFragment) getParentFragment());
+        acceptThread.start();
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_MEDIA_IMAGES}, 33);
+        }
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_MEDIA_VIDEO}, 33);
+        }
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_MEDIA_AUDIO}, 33);
+        }
+
+        cancelButton.setOnClickListener(view1 -> {
+            handleReceivedFileData(data);
 //                Intent intent = new Intent(requireActivity(), MainActivity.class);
 //                startActivity(intent);
-                acceptThread = new AcceptThread((RecipientFragment) getParentFragment());
-                acceptThread.start();
-            }
         });
 
         return view;
     }
-    public void write(String message) {
-        textView.setText(message);
-    }
 
     private class AcceptThread extends Thread {
-        private BluetoothServerSocket mmServerSocket;
+        private final BluetoothServerSocket mmServerSocket;
         public BluetoothSocket socket;
 
         public AcceptThread(RecipientFragment recipientFragment) {
@@ -70,13 +120,15 @@ public class RecipientFragment extends Fragment {
             try {
                 // MY_UUID is the app's UUID string, also used by the client code.
                 if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    askPermission();
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
                 }
                 tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(CONSTANTS.NAME, CONSTANTS.MY_UUID);
             } catch (IOException e) {
+                e.printStackTrace();
             }
             mmServerSocket = tmp;
         }
+
 
         public void run() {
             socket = null;
@@ -94,7 +146,7 @@ public class RecipientFragment extends Fragment {
                     // the connection in a separate thread.
                     //manageMyConnectedSocket(socket);
                     try {
-                        connectedThread = new ConnectedThread(socket);
+                        ConnectedThread connectedThread = new ConnectedThread(socket, handler);
                         connectedThread.start();
                         mmServerSocket.close();
                     } catch (IOException e) {
@@ -110,100 +162,53 @@ public class RecipientFragment extends Fragment {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
+    private static final int REQUEST_WRITE_STORAGE = 112;
 
-    public void askPermission(){
-        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN}, 1);
-            try {
-                wait(750);
-            } catch (InterruptedException e) {
-            }
+    private void handleReceivedFileData(byte[] data) {
+        // Check if write permission is granted
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+        }
+
+        // Generate filename with date, time, and file type
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+        String currentTimeStamp = dateFormat.format(new Date());
+        String filename = "received_file_" + currentTimeStamp + "." + detectFileType(data);
+
+        // Define the directory path
+        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "QuickShare");
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create the directory if it doesn't exist
+        }
+
+        // Save the received file to the device's storage within the QuickShare directory
+        File receivedFile = new File(directory, filename);
+        try (OutputStream outputStream = new FileOutputStream(receivedFile)) {
+            outputStream.write(data);
+            // File saved successfully, show a message or perform any necessary action
+            Toast.makeText(requireContext(), "File saved successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle file saving failure
         }
     }
 
+    public static String detectFileType(byte[] fileBytes) {
+        try (InputStream stream = new ByteArrayInputStream(fileBytes)) {
+            Detector detector = new AutoDetectParser().getDetector();
+            Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, "filename"); // You can set the filename here if available
 
-    private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-        private byte[] mmBuffer; // mmBuffer store for the stream
-
-        public ConnectedThread(BluetoothSocket socket) {
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            // Get the input and output streams; using temp objects because
-            // member streams are final.
-            try {
-                tmpIn = socket.getInputStream();
-            } catch (IOException e) {
-            }
-            try {
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-            }
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        @SuppressLint("SetTextI18n")
-        public void run() {
-            mmBuffer = new byte[1024];
-            int numBytes; // bytes returned from read()
-
-            // Keep listening to the InputStream until an exception occurs.
-            while (true) {
-                try {
-                    // Read from the InputStream.
-                    numBytes = mmInStream.read(mmBuffer);
-                    // Send the obtained bytes to the UI activity.
-
-
-                    Message readMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_READ, numBytes, -1,
-                            mmBuffer);
-                    readMsg.sendToTarget();
-                } catch (IOException e) {
-                    break;
-                }
-            }
-        }
-
-        // Call this from the main activity to send data to the remote device.
-        public void write(byte[] bytes) {
-            try {
-                mmOutStream.write(bytes);
-
-                // Share the sent message with the UI activity.
-//                Message writtenMsg = handler.obtainMessage(
-//                        MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
-                // writtenMsg.sendToTarget();
-            } catch (IOException e) {
-
-                // Send a failure message back to the activity.
-                Message writeErrorMsg =
-                        handler.obtainMessage(CONSTANTS.MessageConstants.MESSAGE_TOAST);
-                Bundle bundle = new Bundle();
-                bundle.putString("toast",
-                        "Couldn't send data to the other device");
-                writeErrorMsg.setData(bundle);
-                handler.sendMessage(writeErrorMsg);
-            }
-        }
-
-        // Call this method from the main activity to shut down the connection.
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-            }
+            MediaType mediaType = detector.detect(TikaInputStream.get(stream), metadata);
+            return mediaType.getSubtype(); // Get only the subtype
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Unknown";
         }
     }
-
 }
