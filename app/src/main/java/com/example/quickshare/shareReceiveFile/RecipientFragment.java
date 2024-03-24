@@ -1,21 +1,16 @@
 package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +18,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
 import com.example.quickshare.CONSTANTS;
@@ -36,15 +29,11 @@ import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -61,28 +50,27 @@ public class RecipientFragment extends Fragment {
     private AcceptThread acceptThread;
     private TextView textView;
     private Handler handler;
+    private String fileType;
 
     byte[] data;
+    @SuppressLint("HandlerLeak")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipient, container, false);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                switch (msg.what) {
-                    case CONSTANTS.MessageConstants.MESSAGE_FILE_RECEIVED:
-                        data = (byte[]) msg.obj;
-                        return true;
-                    case CONSTANTS.MessageConstants.MESSAGE_READ_FILE:
-                        // Handle the read file message
-                        textView.setText(msg.obj.toString());
-                        return true;
+
+        handler = new Handler(){
+
+            public void handleMessage(@NonNull Message msg) {
+                FragmentActivity activity = getActivity();
+                if (msg.what == CONSTANTS.MessageConstants.MESSAGE_READ) {
+                    byte[] readBuf = (byte[]) msg.obj;
+
+                    handleReceivedFileData(readBuf);
                 }
-                return false;
             }
-        });
+        };
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         textView = view.findViewById(R.id.textView1);
@@ -101,9 +89,9 @@ public class RecipientFragment extends Fragment {
         }
 
         cancelButton.setOnClickListener(view1 -> {
-            handleReceivedFileData(data);
-//                Intent intent = new Intent(requireActivity(), MainActivity.class);
-//                startActivity(intent);
+//            handleReceivedFileData(data);
+                Intent intent = new Intent(requireActivity(), MainActivity.class);
+                startActivity(intent);
         });
 
         return view;

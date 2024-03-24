@@ -6,6 +6,12 @@ public class SharedFile {
     private final String date;
     private final String fileSize; // Add the file path property
 
+    public SharedFile(String filePath, String fileType, String date, int fileSize) {
+        this.filePath = filePath;
+        this.fileType = fileType;
+        this.date = date;
+        this.fileSize = String.valueOf(fileSize);
+    }
     public SharedFile(String filePath, String fileType, String date, String fileSize) {
         this.filePath = filePath;
         this.fileType = fileType;

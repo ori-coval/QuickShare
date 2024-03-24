@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -15,11 +14,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.MainActivity;
 import com.example.quickshare.MyViewPagerAdapter;
 import com.example.quickshare.R;
 import com.google.android.material.tabs.TabLayout;
@@ -46,7 +43,10 @@ public class SendReceiveFileActivity extends AppCompatActivity {
         FileSharingFragment fileSharingFragment;
 
         if(getIntent().getStringExtra("file_path")!=null && getIntent().getStringExtra("file_type")!=null && getIntent().getStringExtra("file_size")!=null) {
-            fileSharingFragment = new FileSharingFragment(getIntent().getStringExtra("file_path"),getIntent().getStringExtra("file_type"),getIntent().getStringExtra("file_size"));
+            fileSharingFragment = new FileSharingFragment(
+                    getIntent().getStringExtra("file_path"),
+                    getIntent().getStringExtra("file_type"),
+                    Integer.parseInt(getIntent().getStringExtra("file_size")!=null ? getIntent().getStringExtra("file_size") : "0"));
         }
         else {
             fileSharingFragment = new FileSharingFragment();
