@@ -3,70 +3,69 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="16dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
         <TextView
             android:id="@+id/textFileName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
+            android:maxLines="1"
             android:text="File Name" />
 
         <TextView
-            android:id="@+id/textFileType"
-            android:layout_width="0dp"
+            android:id="@+id/textFileSize"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
-            android:text="File Type" />
+            android:maxLines="1"
+            android:text="file size" />
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Delete" />
+
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
         <TextView
-            android:id="@+id/textRecipient"
-            android:layout_width="0dp"
+            android:id="@+id/textFileType"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
-            android:text="Recipient" />
+            android:maxLines="1"
+            android:text="File Type" />
 
         <TextView
             android:id="@+id/textDate"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
+            android:maxLines="1"
             android:text="Date" />
-    </LinearLayout>
-
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/deleteButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Delete" />
 
         <Button
             android:id="@+id/shareAgainButton"
-            android:layout_width="0dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
             android:text="Share Again" />
-    </LinearLayout>
 
+    </LinearLayout>
 
 </LinearLayout>

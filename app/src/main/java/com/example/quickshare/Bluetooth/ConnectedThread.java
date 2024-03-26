@@ -1,22 +1,18 @@
 package com.example.quickshare.Bluetooth;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
 import com.example.quickshare.CONSTANTS;
+import com.example.quickshare.CustomToast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class ConnectedThread extends Thread {
     private static final int ACKNOWLEDGMENT_TIMEOUT = 3000;
@@ -70,7 +66,7 @@ public class ConnectedThread extends Thread {
     private int expectedBytes = -1; // Track expected bytes
     private int receivedBytes = 0; // Track received bytes]
     public void run() {
-        mmBuffer = new byte[1024]; // Adjust buffer size as needed
+        mmBuffer = new byte[1024*1024];
         int numBytes; // bytes returned from read()
 
         ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream(); // Buffer to collect the entire message
@@ -80,28 +76,40 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream.
                 numBytes = mmInStream.read(mmBuffer);
+                receivedBytes += numBytes;
 
-                // Write received bytes to the message buffer
-                messageBuffer.write(mmBuffer, 0, numBytes);
+                // Check if expectedBytes is not set yet
+                // Check if start sequence for length is received
+                if (startsWith(mmBuffer, START_LENGTH_SEQUENCE)) {
+                    // Extract length information
+                    ByteBuffer buffer = ByteBuffer.wrap(mmBuffer, START_LENGTH_SEQUENCE.length, 4);
+                    expectedBytes = buffer.getInt();
+                    receivedBytes = 0; // Reset received bytes count
+                    Message fileSizeMsg = handler.obtainMessage(
+                            CONSTANTS.MessageConstants.MESSAGE_READ_FILE_SIZE, expectedBytes);
+                    fileSizeMsg.sendToTarget();
+
+                    // Adjust mmBuffer size to read actual data
+                    mmBuffer = new byte[1024*1024];
+
+                }
+                else {
+                    // Write received bytes to the message buffer
+                    messageBuffer.write(mmBuffer, 0, numBytes);
+                    Message receivedBytesMsg = handler.obtainMessage(
+                            CONSTANTS.MessageConstants.MESSAGE_PROGRESS, receivedBytes);
+                    receivedBytesMsg.sendToTarget();
+                }
 
                 // Check for end of transmission
                 if (isEndOfTransmission(mmBuffer)) {
                     // Send the obtained bytes to the UI activity.
                     byte[] messageBytes = messageBuffer.toByteArray(); // Get the collected message
-                    String fileType = new String(messageBytes, 0, 4); // Extract file type
-
-                    // Send the obtained bytes to the UI activity using handler
-                    Message readMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_READ_FILE_TYPE, fileType);
-                    readMsg.sendToTarget();
-
-                    // Remove file type bytes from the message
-                    byte[] dataBytes = Arrays.copyOfRange(messageBytes, 4, messageBytes.length);
 
                     // Send the actual data bytes to the UI activity using handler
-                    readMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_READ, dataBytes.length, -1,
-                            dataBytes);
+                    Message readMsg = handler.obtainMessage(
+                            CONSTANTS.MessageConstants.MESSAGE_READ, messageBytes.length, -1,
+                            messageBytes);
                     readMsg.sendToTarget();
 
                     // Reset message buffer for the next message
@@ -135,34 +143,69 @@ public class ConnectedThread extends Thread {
     }
 
 
+    // Method to check if a byte array starts with a specific sequence
+    private boolean startsWith(byte[] array, byte[] sequence) {
+        if (array.length < sequence.length) {
+            return false;
+        }
+
+        for (int i = 0; i < sequence.length; i++) {
+            if (array[i] != sequence[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private static final byte[] START_LENGTH_SEQUENCE = {0x01, 0x02, 0x03, 0x04}; // Example start sequence for length
     private static final byte[] START_FILE_TYPE_SEQUENCE = {0x05, 0x06, 0x07, 0x08}; // Example start sequence for file type
     private static final byte[] START_DATA_SEQUENCE = {0x09, 0x0A, 0x0B, 0x0C}; // Example start sequence for data
     private static final byte[] END_SEQUENCE = {0x0D, 0x0E, 0x0F, 0x10}; // Example end sequence
 
-    // Modify your ConnectedThread class to handle chunking and writing from URI
-// Modify your ConnectedThread class to handle chunking and writing from URI
-    public void write(Uri fileUri, Context context) {
+    // Method to write data to the output stream
+    public void write(byte[] bytes, String fileType, int fileSize, Activity activity) {
         try {
-            InputStream inputStream = context.getContentResolver().openInputStream(fileUri);
 
-            // Create a buffer for reading from the input stream
-            byte[] buffer = new byte[1024 * 1024]; // 1 MB buffer, you can adjust this size as needed
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                mmOutStream.write(START_DATA_SEQUENCE);
-                mmOutStream.write(buffer, 0, bytesRead);
-                // No need to write END_SEQUENCE here
-            }
 
-            // After all chunks have been sent, write the END_SEQUENCE
+
+            // Create a byte array that contains START_LENGTH_SEQUENCE and bytes.length
+            byte[] combined = new byte[START_LENGTH_SEQUENCE.length + 4];
+            // Copy START_LENGTH_SEQUENCE to combined array
+            System.arraycopy(START_LENGTH_SEQUENCE, 0, combined, 0, START_LENGTH_SEQUENCE.length);
+            // Convert length of bytes to byte array
+            byte[] lengthBytes = new byte[] {
+                    (byte) ((bytes.length >> 24) & 0xFF),
+                    (byte) ((bytes.length >> 16) & 0xFF),
+                    (byte) ((bytes.length >> 8) & 0xFF),
+                    (byte) (bytes.length & 0xFF)
+            };
+            // Copy lengthBytes to combined array
+            System.arraycopy(lengthBytes, 0, combined, START_LENGTH_SEQUENCE.length, 4);
+
+            mmOutStream.write(combined);
+
+            Message startedMsg = handler.obtainMessage(
+                    CONSTANTS.MessageConstants.STARTED);
+            startedMsg.sendToTarget();
+
+            Thread.sleep(100);
+            // Write the actual data
+            mmOutStream.write(bytes);
+
+            // Write the finish sequence for data
             mmOutStream.write(END_SEQUENCE);
 
-            inputStream.close();
+            Message finishedMsg = handler.obtainMessage(
+                    CONSTANTS.MessageConstants.FINISHED);
+            finishedMsg.sendToTarget();
+
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle IO exception
+            CustomToast.showWithDuration(activity, "Error: blueTooth not connected" + e.getMessage(), 0.5);
+            // Handle write failure
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

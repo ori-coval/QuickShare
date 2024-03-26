@@ -42,11 +42,26 @@ public class SendReceiveFileActivity extends AppCompatActivity {
 
         FileSharingFragment fileSharingFragment;
 
-        if(getIntent().getStringExtra("file_path")!=null && getIntent().getStringExtra("file_type")!=null && getIntent().getStringExtra("file_size")!=null) {
+        if(getIntent().getStringExtra("file_path")!=null && getIntent().getStringExtra("file_type")!=null && getIntent().getStringExtra("file_size")!=null && getIntent().getStringExtra("file_uri")!=null) {
+            String tmpFileSize = getIntent().getStringExtra("file_size");
+            int fileSize = 0;
+            if(tmpFileSize != null) {
+                try {
+                    fileSize = Integer.parseInt(tmpFileSize);
+                }
+                catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String tmpFileUri = getIntent().getStringExtra("fileData");
+
             fileSharingFragment = new FileSharingFragment(
                     getIntent().getStringExtra("file_path"),
                     getIntent().getStringExtra("file_type"),
-                    Integer.parseInt(getIntent().getStringExtra("file_size")!=null ? getIntent().getStringExtra("file_size") : "0"));
+                    fileSize,
+                    getIntent().getStringExtra("file_uri"),
+                    (byte[])getIntent().getExtras().get("file_data"));
         }
         else {
             fileSharingFragment = new FileSharingFragment();

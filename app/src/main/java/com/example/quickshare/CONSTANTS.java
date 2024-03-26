@@ -21,5 +21,8 @@ public class CONSTANTS {
         int MESSAGE_FILE_RECEIVED = 897456;
         int MESSAGE_READ_FILE_COMPLETE = 39999;
         int MESSAGE_READ_FILE_TYPE = 8888;
+        int MESSAGE_READ_FILE_SIZE = 89315;
+        int FINISHED = 4891854;
+        int STARTED = 88824564;
     }
 }

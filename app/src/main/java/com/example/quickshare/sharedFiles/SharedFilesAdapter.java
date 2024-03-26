@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quickshare.CONSTANTS;
 import com.example.quickshare.DB.DataBaseHelper;
-import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 import com.example.quickshare.shareReceiveFile.SendReceiveFileActivity;
 
@@ -46,6 +46,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         holder.textFileName.setText(sharedFile.getFilePath());
         holder.textFileType.setText(sharedFile.getFileType());
         holder.textDate.setText(sharedFile.getDate());
+        holder.textFileSize.setText(sharedFile.getFileSize()+" MB");
 
         // Implement click listeners for buttons
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +70,10 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
                 sendFileIntent.putExtra("file_path", sharedFile.getFilePath());
                 sendFileIntent.putExtra("file_type", sharedFile.getFileType());
                 sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
+                sendFileIntent.putExtra("file_uri", sharedFile.getFileUri().toString());
+                byte[] fileData = sharedFile.getFileData();
+                sendFileIntent.putExtra("file_data", fileData);
+                sendFileIntent.putExtra("file_data", sharedFile.getFileData());
                 startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
             }
         });
@@ -81,14 +86,14 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
     }
 
     public class SharedFileViewHolder extends RecyclerView.ViewHolder {
-        public TextView textFileName, textFileType, textRecipient, textDate;
+        public TextView textFileName, textFileType, textFileSize, textDate;
         public Button deleteButton, shareAgainButton;
 
         public SharedFileViewHolder(View itemView) {
             super(itemView);
             textFileName = itemView.findViewById(R.id.textFileName);
             textFileType = itemView.findViewById(R.id.textFileType);
-            textRecipient = itemView.findViewById(R.id.textRecipient);
+            textFileSize = itemView.findViewById(R.id.textFileSize);
             textDate = itemView.findViewById(R.id.textDate);
             deleteButton = itemView.findViewById(R.id.deleteButton);
             shareAgainButton = itemView.findViewById(R.id.shareAgainButton);

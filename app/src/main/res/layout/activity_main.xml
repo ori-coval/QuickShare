@@ -5,45 +5,45 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/LightGray"
-    android:padding="16dp">
+    android:padding="8dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <!-- App Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Quick"
+                    android:textColor="@color/blue_primary"
+                    android:textSize="28sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Share"
+                    android:textColor="@color/peach"
+                    android:textSize="28sp"
+                    android:textStyle="bold"/>
 
-    <!-- Profile Picture -->
-    <ImageView
-        android:id="@+id/profile_picture"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:src="@drawable/app_image"
-        android:scaleType="centerCrop"
-        android:layout_gravity="center_horizontal"
-        android:contentDescription="User Profile Picture" />
+            </LinearLayout>
 
-    <!-- App Title -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="QuickShare - Nearby File Sharing"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"/>
+            <!-- App Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Nearby File Sharing"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
-    <!-- Send File Button -->
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="Send File"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:id="@+id/send_file_button" />
+        </LinearLayout>
 
-    <!-- receive Files Button -->
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="receive Files"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:id="@+id/receive_file_button" />
 
     <!-- How to Use Section -->
     <TextView
@@ -59,18 +59,36 @@
         android:text="1. Click 'Send File' to start sharing."
         android:textSize="14sp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="2. Click 'Shared Files' to view shared files."
-        android:textSize="14sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="3. Click 'receive Files' to receive a file."
+        android:text="2. Click 'receive Files' to receive a file."
         android:textSize="14sp" />
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="100dp">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_file_button"
+            style="@style/rounded_button_peach"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginRight="18dp"
+            android:text="Send" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/receive_file_button"
+            style="@style/rounded_button_blue"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:text="Receive" />
+    </LinearLayout>
     <!-- Title -->
     <TextView
         android:id="@+id/textTitle"

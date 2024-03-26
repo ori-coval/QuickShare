@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,12 @@ import com.example.quickshare.CONSTANTS;
 import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 
+import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,19 +45,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.tika.detect.Detector;
-import org.apache.tika.io.TikaInputStream;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.AutoDetectParser;
-
 public class RecipientFragment extends Fragment {
 
     private BluetoothAdapter bluetoothAdapter;
     private AcceptThread acceptThread;
-    private TextView textView;
+    private TextView fileSizeTextView, textStatus;
     private Handler handler;
-    private String fileType;
+    private int fileSize;
+    private ProgressBar progressBar;
 
     byte[] data;
     @SuppressLint("HandlerLeak")
@@ -59,21 +61,41 @@ public class RecipientFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipient, container, false);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Button cancelButton = view.findViewById(R.id.cancel_button);
+        fileSizeTextView = view.findViewById(R.id.textFileSize);
+        textStatus = view.findViewById(R.id.textStatus);
+        progressBar = view.findViewById(R.id.progressBar);
 
-        handler = new Handler(){
-
+        handler = new Handler() {
             public void handleMessage(@NonNull Message msg) {
                 FragmentActivity activity = getActivity();
-                if (msg.what == CONSTANTS.MessageConstants.MESSAGE_READ) {
-                    byte[] readBuf = (byte[]) msg.obj;
+                switch (msg.what) {
+                    case CONSTANTS.MessageConstants.MESSAGE_READ:
+                        byte[] readBuf = (byte[]) msg.obj;
+                        handleReceivedFileData(readBuf);
+                        break;
 
-                    handleReceivedFileData(readBuf);
+                    case CONSTANTS.MessageConstants.MESSAGE_READ_FILE_SIZE:
+                        fileSize = (int)msg.obj;
+                        progressBar.setVisibility(View.VISIBLE);
+                        fileSizeTextView.setVisibility(View.VISIBLE);
+                        fileSizeTextView.setText("File Size: " + fileSize + " MB");
+                        textStatus.setVisibility(View.GONE);
+
+                    case CONSTANTS.MessageConstants.MESSAGE_PROGRESS:
+                        int progress = 0;
+                        try {
+                            progress = ((Integer) msg.obj * 100) / fileSize ;
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        progressBar.setProgress(progress);
                 }
             }
         };
 
-        Button cancelButton = view.findViewById(R.id.cancel_button);
-        textView = view.findViewById(R.id.textView1);
+
 
         acceptThread = new AcceptThread((RecipientFragment) getParentFragment());
         acceptThread.start();

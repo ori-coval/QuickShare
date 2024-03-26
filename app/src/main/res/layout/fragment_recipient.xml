@@ -6,57 +6,32 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/textRecipientName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:visibility="gone"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/textFileType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:visibility="gone"
-        android:textSize="16sp" />
-
-    <!-- Add a preview image or view here if applicable -->
-
-    <Button
-        android:id="@+id/buttonAccept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Accept" />
-
-    <Button
-        android:id="@+id/buttonDecline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Decline" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
 
     <TextView
         android:id="@+id/textStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Waiting for Sender"
-        android:textSize="16sp"
+        android:textSize="25dp"
+        android:layout_marginTop="30dp"
         android:visibility="visible"/>
+
+    <TextView
+        android:layout_marginTop="30dp"
+        android:id="@+id/textFileSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="32 mb"
+        android:visibility="gone"
+        android:textSize="25dp" />
+
+    <ProgressBar
+        android:layout_marginTop="200dp"
+        android:id="@+id/progressBar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <!-- Cancel Button -->
     <Button

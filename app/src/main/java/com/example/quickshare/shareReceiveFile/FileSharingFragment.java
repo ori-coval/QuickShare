@@ -1,6 +1,7 @@
 package com.example.quickshare.shareReceiveFile;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -29,12 +28,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
 import com.example.quickshare.CONSTANTS;
+import com.example.quickshare.CustomToast;
+import com.example.quickshare.DB.DataBaseHelper;
 import com.example.quickshare.MainActivity;
 import com.example.quickshare.R;
 import com.example.quickshare.sharedFiles.SharedFile;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +45,6 @@ public class FileSharingFragment extends Fragment {
     private ActivityResultLauncher<String> fileSelectionLauncher;
     private ActivityResultLauncher<Intent> bluetoothConnectLauncher;
     private BluetoothAdapter bluetoothAdapter;
-    private ConnectThread connectThread;
     private ConnectedThread connectedThread;
     private static BluetoothSocket socket;
     private boolean hasFile = false;
@@ -54,19 +52,22 @@ public class FileSharingFragment extends Fragment {
     private int fileSize;
     private String filePath;
     private SharedFile sharedFile;
-    private Handler handler;
     private String fileInfoText;
+    private DataBaseHelper dataBaseHelper;
+    private boolean isSendingFile = false;
+    private byte[] fileData;
 
     public FileSharingFragment() {
 
     }
 
-    public FileSharingFragment(String filePath, String fileType, int fileSize) {
+    public FileSharingFragment(String filePath, String fileType, int fileSize, String fileUri, byte[] fileData) {
         this.filePath = filePath;
         this.fileType = fileType;
         this.fileSize = fileSize;
+        this.fileData = fileData;
+        selectedFileUri = Uri.parse(fileUri);
 
-        sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize);
         fileInfoText = "Selected File: " + filePath + " (Size: " + fileSize + ", Type: " + fileType + ")";
         hasFile = true;
     }
@@ -75,13 +76,13 @@ public class FileSharingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_file_sharing, container, false);
 
+        dataBaseHelper = new DataBaseHelper(requireActivity());
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        handler = new Handler(requireActivity().getMainLooper());
 
         // Initialize UI elements
         Button selectFileButton = view.findViewById(R.id.select_file_button);
         Button viaBluetoothButton = view.findViewById(R.id.via_bluetooth_button);
-        Button viaNfcButton = view.findViewById(R.id.via_nfc_button);
         Button sendFileButton = view.findViewById(R.id.send_file_button);
         Button cancelButton = view.findViewById(R.id.cancel_button);
         selectedFileInfo = view.findViewById(R.id.TV_file_info);
@@ -92,12 +93,20 @@ public class FileSharingFragment extends Fragment {
             selectedFileInfo.setText(fileInfoText);
         }
 
+        if(selectedFileUri != null) {
+
+            isSendingFile = true;
+        }
+
         Handler handler = new Handler(requireActivity().getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (msg.what == CONSTANTS.MessageConstants.MESSAGE_PROGRESS) {
-                    int progress = msg.getData().getInt("progress");
-                    progressBar.setProgress(progress);
+                if (msg.what == CONSTANTS.MessageConstants.FINISHED) {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+                if (msg.what == CONSTANTS.MessageConstants.STARTED) {
+                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -118,25 +127,24 @@ public class FileSharingFragment extends Fragment {
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
-                        Toast.makeText(getContext(), "Connecting", Toast.LENGTH_SHORT).show();
-                        for(int i = 0; i < 5; i++) {
+                        CustomToast.showWithDuration(getContext(), "Connecting", 0.5);
+                        for(int i = 0; i <= 5; i++) {
                             connectDevice(data);
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
                             if(socket!=null && socket.isConnected())
                                 break;
-                            if(i == 4) {
-                                Toast.makeText(getContext(), "Connection failed", Toast.LENGTH_SHORT).show();
+                            if(i == 5) {
                                 Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
                                 bluetoothConnectLauncher.launch(serverIntent);
                             }
                         }
 
                         if(socket!=null && socket.isConnected()){
-                            if (hasFile) {
-                                sendFileButton.setEnabled(true);
-                            }
-                            else {
-                                sendFileButton.setEnabled(false);
-                            }
+                            sendFileButton.setEnabled(hasFile);
                         }
                     }
                 });
@@ -146,18 +154,43 @@ public class FileSharingFragment extends Fragment {
             bluetoothConnectLauncher.launch(serverIntent);
         });
 
-        viaNfcButton.setOnClickListener(view13 -> {
-            //TODO: Implement NFC recipient selection
-        });
-
-
-// Modify your sendFileButton click listener to pass the file URI directly
         sendFileButton.setOnClickListener(view14 -> {
-            if (socket != null && hasFile) {
-                connectedThread = new ConnectedThread(socket, handler);
-                progressBar.setVisibility(View.VISIBLE);
-                sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize);
-                connectedThread.write(selectedFileUri, getContext());
+            if (socket != null && socket.isConnected()) {
+                if(hasFile){
+                    connectedThread=new ConnectedThread(socket,handler);
+                    progressBar.setVisibility(View.VISIBLE);
+                    byte[] bytes;
+
+                    if(isSendingFile){
+                        bytes = this.fileData;
+                    }
+                    else {
+                        InputStream inputStream;
+                        try {
+                            inputStream = requireContext().getContentResolver().openInputStream(selectedFileUri);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                        bytes = new byte[fileSize];
+                        try {
+                            inputStream.read(bytes);
+                            inputStream.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize, selectedFileUri, bytes);
+                    connectedThread.write(bytes,fileType, fileSize, requireActivity());
+                    dataBaseHelper.insertSharedFile(sharedFile);
+
+                }
+            }
+            else{
+                CustomToast.showWithDuration(getContext(), "bluetooth not connected", 0.5);
+
+                Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
+                bluetoothConnectLauncher.launch(serverIntent);
             }
         });
 
@@ -176,8 +209,7 @@ public class FileSharingFragment extends Fragment {
                         selectedFileUri = result;
                         handleSelectedFile(selectedFileUri);
                     }
-                    if (connectThread != null && connectThread.isAlive() && hasFile) {
-                        sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize);
+                    if ( socket != null && socket.isConnected() && hasFile) {
                         sendFileButton.setEnabled(true);
                     }
                 });
@@ -189,19 +221,17 @@ public class FileSharingFragment extends Fragment {
         fileSelectionLauncher.launch("*/*");
     }
 
+    @SuppressLint("DefaultLocale")
     private void handleSelectedFile(Uri fileUri) {
         // Handle the selected file URI here
-        Cursor returnCursor = getActivity().getContentResolver().query(fileUri, null, null, null, null);
-        int nameIndex = 0;
-        if (returnCursor != null) {
-            nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        }
+        Cursor returnCursor = requireActivity().getContentResolver().query(fileUri, null, null, null, null);
+
         int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
         returnCursor.moveToFirst();
 
         filePath = fileUri.getPath();
         fileSize = returnCursor.getInt(sizeIndex);
-        fileType = getActivity().getContentResolver().getType(fileUri);
+        fileType = requireActivity().getContentResolver().getType(fileUri);
         int index = 0;
         if (fileType != null) {
             index = fileType.indexOf('/');
@@ -227,7 +257,7 @@ public class FileSharingFragment extends Fragment {
     }
 
     public synchronized void connect(BluetoothDevice device) {
-        connectThread = new ConnectThread(device);
+        ConnectThread connectThread = new ConnectThread(device);
         connectThread.start();
     }
 
@@ -237,8 +267,8 @@ public class FileSharingFragment extends Fragment {
         public ConnectThread(BluetoothDevice device) {
             BluetoothSocket tmp = null;
             try {
-                if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
+                if (ActivityCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
                 }
                 tmp = device.createRfcommSocketToServiceRecord(CONSTANTS.MY_UUID);
             } catch (IOException e) {
@@ -248,8 +278,8 @@ public class FileSharingFragment extends Fragment {
         }
 
         public void run() {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 33);
+            if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 33);
             }
             bluetoothAdapter.cancelDiscovery();
             try {
@@ -261,14 +291,6 @@ public class FileSharingFragment extends Fragment {
                 } catch (IOException closeException) {
                     closeException.printStackTrace();
                 }
-            }
-        }
-
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
