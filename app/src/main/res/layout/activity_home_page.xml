@@ -79,7 +79,8 @@
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
             android:layout_marginRight="18dp"
-            android:text="Send" />
+            android:text="Send"
+            android:onClick="onClick"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/receive_file_button"
@@ -87,7 +88,8 @@
             android:layout_width="150dp"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
-            android:text="Receive" />
+            android:text="Receive"
+            android:onClick="onClick"/>
     </LinearLayout>
     <!-- Title -->
     <TextView
@@ -106,16 +108,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/textTitle" />
-
-    <!-- Empty State Message -->
-    <TextView
-        android:id="@+id/empty_state_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No shared files found"
-        android:textSize="25dp"
-        android:layout_marginTop="220dp"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone" />
 
 </LinearLayout>

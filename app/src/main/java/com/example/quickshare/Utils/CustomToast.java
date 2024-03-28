@@ -1,4 +1,4 @@
-package com.example.quickshare;
+package com.example.quickshare.Utils;
 
 import android.content.Context;
 import android.os.Handler;

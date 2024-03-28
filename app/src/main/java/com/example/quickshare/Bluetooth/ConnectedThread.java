@@ -5,8 +5,8 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Message;
 
-import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.CustomToast;
+import com.example.quickshare.Utils.CONSTANTS;
+import com.example.quickshare.Utils.CustomToast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class ConnectedThread extends Thread {
 
                     // Send the actual data bytes to the UI activity using handler
                     Message readMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_READ, messageBytes.length, -1,
+                            CONSTANTS.MessageConstants.FINISHED, messageBytes.length, -1,
                             messageBytes);
                     readMsg.sendToTarget();
 

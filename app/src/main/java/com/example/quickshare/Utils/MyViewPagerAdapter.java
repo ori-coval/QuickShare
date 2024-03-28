@@ -1,4 +1,4 @@
-package com.example.quickshare;
+package com.example.quickshare.Utils;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

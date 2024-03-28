@@ -1,29 +1,28 @@
 package com.example.quickshare.sharedFiles;
 
-import android.net.Uri;
+import androidx.annotation.NonNull;
 
 public class SharedFile {
     private final String filePath;
     private final String fileType;
     private final String date;
     private final String fileSize;
-    private final Uri fileUri;;
     private final byte[] fileData;
 
-    public SharedFile(String filePath, String fileType, String date, int fileSize, Uri fileUri, byte[] fileData) {
+
+    public SharedFile(@NonNull String filePath, @NonNull String fileType, @NonNull String date,@NonNull int fileSize, @NonNull byte[] fileData) {
         this.filePath = filePath;
         this.fileType = fileType;
         this.date = date;
         this.fileSize = String.valueOf(fileSize);
-        this.fileUri = fileUri;
         this.fileData = fileData;
     }
-    public SharedFile(String filePath, String fileType, String date, String fileSize, Uri fileUri, byte[] fileData) {
+
+    public SharedFile(@NonNull String filePath, @NonNull String fileType, @NonNull String date, @NonNull String fileSize, @NonNull byte[] fileData) {
         this.filePath = filePath;
         this.fileType = fileType;
         this.date = date;
         this.fileSize = fileSize;
-        this.fileUri = fileUri;
         this.fileData = fileData;
     }
 
@@ -43,9 +42,6 @@ public class SharedFile {
         return fileSize;
     }
 
-    public Uri getFileUri() {
-        return fileUri;
-    }
     public byte[] getFileData() {
         return fileData;
     }

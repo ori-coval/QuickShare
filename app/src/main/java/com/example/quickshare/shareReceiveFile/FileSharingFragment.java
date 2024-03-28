@@ -27,11 +27,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
-import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.CustomToast;
+import com.example.quickshare.Bluetooth.DeviceListActivity;
 import com.example.quickshare.DB.DataBaseHelper;
-import com.example.quickshare.MainActivity;
+import com.example.quickshare.homePage.HomePageActivity;
 import com.example.quickshare.R;
+import com.example.quickshare.Utils.CONSTANTS;
+import com.example.quickshare.Utils.CustomToast;
 import com.example.quickshare.sharedFiles.SharedFile;
 
 import java.io.FileNotFoundException;
@@ -61,12 +62,11 @@ public class FileSharingFragment extends Fragment {
 
     }
 
-    public FileSharingFragment(String filePath, String fileType, int fileSize, String fileUri, byte[] fileData) {
+    public FileSharingFragment(String filePath, String fileType, int fileSize, byte[] fileData) {
         this.filePath = filePath;
         this.fileType = fileType;
         this.fileSize = fileSize;
         this.fileData = fileData;
-        selectedFileUri = Uri.parse(fileUri);
 
         fileInfoText = "Selected File: " + filePath + " (Size: " + fileSize + ", Type: " + fileType + ")";
         hasFile = true;
@@ -93,8 +93,7 @@ public class FileSharingFragment extends Fragment {
             selectedFileInfo.setText(fileInfoText);
         }
 
-        if(selectedFileUri != null) {
-
+        if(fileData != null) {
             isSendingFile = true;
         }
 
@@ -117,7 +116,6 @@ public class FileSharingFragment extends Fragment {
         // Set click listeners for buttons
         selectFileButton.setOnClickListener(view1 -> {
             chooseFile();
-            //TODO: Implement file selection logic
         });
 
 
@@ -138,7 +136,13 @@ public class FileSharingFragment extends Fragment {
                             if(socket!=null && socket.isConnected())
                                 break;
                             if(i == 5) {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
                                 Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
+                                serverIntent.putExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST, "Connection Failed try again");
                                 bluetoothConnectLauncher.launch(serverIntent);
                             }
                         }
@@ -180,7 +184,7 @@ public class FileSharingFragment extends Fragment {
                         }
                     }
 
-                    sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize, selectedFileUri, bytes);
+                    sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize, bytes);
                     connectedThread.write(bytes,fileType, fileSize, requireActivity());
                     dataBaseHelper.insertSharedFile(sharedFile);
 
@@ -196,7 +200,7 @@ public class FileSharingFragment extends Fragment {
 
 
         cancelButton.setOnClickListener(view15 -> {
-            Intent intent = new Intent(requireActivity(), MainActivity.class);
+            Intent intent = new Intent(requireActivity(), HomePageActivity.class);
             startActivity(intent);
         });
 
@@ -270,7 +274,7 @@ public class FileSharingFragment extends Fragment {
                 if (ActivityCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
                 }
-                tmp = device.createRfcommSocketToServiceRecord(CONSTANTS.MY_UUID);
+                tmp = device.createRfcommSocketToServiceRecord(CONSTANTS.misc.MY_UUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }

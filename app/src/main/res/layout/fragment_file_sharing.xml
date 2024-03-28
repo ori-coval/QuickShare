@@ -58,21 +58,12 @@
 
         <!-- Via Bluetooth Button -->
         <Button
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Via Bluetooth"
+            android:text="connect via Bluetooth"
             android:id="@+id/via_bluetooth_button"
             android:layout_marginEnd="8dp" />
-
-        <!-- Via NFC Button -->
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Via NFC"
-            android:id="@+id/via_nfc_button"
-            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <!-- Send File Button -->

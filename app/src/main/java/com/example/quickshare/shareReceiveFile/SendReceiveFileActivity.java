@@ -16,9 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.MyViewPagerAdapter;
 import com.example.quickshare.R;
+import com.example.quickshare.Utils.CONSTANTS;
+import com.example.quickshare.Utils.MyViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -60,7 +60,6 @@ public class SendReceiveFileActivity extends AppCompatActivity {
                     getIntent().getStringExtra("file_path"),
                     getIntent().getStringExtra("file_type"),
                     fileSize,
-                    getIntent().getStringExtra("file_uri"),
                     (byte[])getIntent().getExtras().get("file_data"));
         }
         else {
@@ -82,10 +81,10 @@ public class SendReceiveFileActivity extends AppCompatActivity {
                 new TabLayoutMediator.TabConfigurationStrategy() {
                     @Override
                     public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                        if(position == CONSTANTS.SEND_FILE_POSE) {
+                        if(position == CONSTANTS.misc.SEND_FILE_POSE) {
                             tab.setText("Share file");
                         }
-                        if (position == CONSTANTS.RECEIVE_FILE_POSE) {
+                        if (position == CONSTANTS.misc.RECEIVE_FILE_POSE) {
                             tab.setText("Receive file");
                         }
                     }
@@ -93,7 +92,7 @@ public class SendReceiveFileActivity extends AppCompatActivity {
         ).attach();
 
 
-        int defaultFragment = getIntent().getIntExtra("default_fragment", CONSTANTS.SEND_FILE_POSE); // Default to Share file fragment
+        int defaultFragment = getIntent().getIntExtra("default_fragment", CONSTANTS.misc.SEND_FILE_POSE); // Default to Share file fragment
         viewPager.setCurrentItem(defaultFragment);
 
     }

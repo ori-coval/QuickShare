@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.quickshare.shareReceiveFile;
+package com.example.quickshare.Bluetooth;
 
 import android.Manifest;
 import android.app.Activity;
@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -37,6 +38,8 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 
 import com.example.quickshare.R;
+import com.example.quickshare.Utils.CONSTANTS;
+import com.example.quickshare.Utils.CustomToast;
 
 import java.util.Set;
 
@@ -67,6 +70,9 @@ public class DeviceListActivity extends Activity {
      * Newly discovered devices
      */
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
+
+
+    private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +136,11 @@ public class DeviceListActivity extends Activity {
             String noDevices = getResources().getText(R.string.none_paired).toString();
             pairedDevicesArrayAdapter.add(noDevices);
         }
+
+        if(getIntent().getStringExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST) != null){
+            CustomToast.showWithDuration(this, getIntent().getStringExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST), 2);
+            //TODO: TTS
+        }
     }
 
     @Override
@@ -152,10 +163,6 @@ public class DeviceListActivity extends Activity {
      * Start device discover with the BluetoothAdapter
      */
     private void doDiscovery() {
-
-        // Indicate scanning in the title
-        setProgressBarIndeterminateVisibility(true);
-        setTitle(R.string.scanning);
 
         // If we're already discovering, stop it
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {

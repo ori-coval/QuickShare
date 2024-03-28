@@ -10,6 +10,7 @@
         android:usesPermissionFlags="neverForLocation"/>
 
 
+
     <uses-feature
         android:name="android.hardware.bluetooth"
         android:required="true" />
@@ -27,10 +28,10 @@
         <activity
             android:name=".shareReceiveFile.SendReceiveFileActivity"
             android:exported="false" />
-        <activity android:name=".shareReceiveFile.DeviceListActivity"
+        <activity android:name=".Bluetooth.DeviceListActivity"
             android:exported="false"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".homePage.HomePageActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

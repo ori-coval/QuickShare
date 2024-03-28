@@ -2,6 +2,7 @@ package com.example.quickshare.sharedFiles;
 
 import static androidx.core.content.ContextCompat.startActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -13,9 +14,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.quickshare.CONSTANTS;
 import com.example.quickshare.DB.DataBaseHelper;
 import com.example.quickshare.R;
+import com.example.quickshare.Utils.CONSTANTS;
 import com.example.quickshare.shareReceiveFile.SendReceiveFileActivity;
 
 import java.util.List;
@@ -23,8 +24,8 @@ import java.util.List;
 public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.SharedFileViewHolder> {
 
     private final List<SharedFile> sharedFiles;
-    private DataBaseHelper dataBaseHelper;
-    Context context;
+    private final DataBaseHelper dataBaseHelper;
+    private final Context context;
 
     public SharedFilesAdapter(List<SharedFile> sharedFiles, Context context) {
         this.context = context;
@@ -40,6 +41,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         return new SharedFileViewHolder(itemView);
     }
 
+    @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
     @Override
     public void onBindViewHolder(@NonNull SharedFileViewHolder holder, int position) {
         SharedFile sharedFile = sharedFiles.get(position);
@@ -49,33 +51,26 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         holder.textFileSize.setText(sharedFile.getFileSize()+" MB");
 
         // Implement click listeners for buttons
-        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    dataBaseHelper.deleteSharedFile(sharedFiles.get(adapterPosition).getFilePath());
-                    sharedFiles.remove(adapterPosition);
-                    notifyDataSetChanged(); // Refresh the RecyclerView
-                }
+        holder.deleteButton.setOnClickListener(view -> {
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                dataBaseHelper.deleteSharedFile(sharedFiles.get(adapterPosition).getFilePath());
+                sharedFiles.remove(adapterPosition);
+                notifyDataSetChanged(); // Refresh the RecyclerView
             }
         });
 
-        holder.shareAgainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Start the File Sharing Activity
-                Intent sendFileIntent = new Intent(context, SendReceiveFileActivity.class);
-                sendFileIntent.putExtra("default_fragment", CONSTANTS.SEND_FILE_POSE);
-                sendFileIntent.putExtra("file_path", sharedFile.getFilePath());
-                sendFileIntent.putExtra("file_type", sharedFile.getFileType());
-                sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
-                sendFileIntent.putExtra("file_uri", sharedFile.getFileUri().toString());
-                byte[] fileData = sharedFile.getFileData();
-                sendFileIntent.putExtra("file_data", fileData);
-                sendFileIntent.putExtra("file_data", sharedFile.getFileData());
-                startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
-            }
+        holder.shareAgainButton.setOnClickListener(view -> {
+            // Start the File Sharing Activity
+            Intent sendFileIntent = new Intent(context, SendReceiveFileActivity.class);
+            sendFileIntent.putExtra("default_fragment", CONSTANTS.misc.SEND_FILE_POSE);
+            sendFileIntent.putExtra("file_path", sharedFile.getFilePath());
+            sendFileIntent.putExtra("file_type", sharedFile.getFileType());
+            sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
+            byte[] fileData = sharedFile.getFileData();
+            sendFileIntent.putExtra("file_data", fileData);
+            sendFileIntent.putExtra("file_data", sharedFile.getFileData());
+            startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
         });
     }
 
@@ -85,7 +80,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
         return sharedFiles.size();
     }
 
-    public class SharedFileViewHolder extends RecyclerView.ViewHolder {
+    public static class SharedFileViewHolder extends RecyclerView.ViewHolder {
         public TextView textFileName, textFileType, textFileSize, textDate;
         public Button deleteButton, shareAgainButton;
 

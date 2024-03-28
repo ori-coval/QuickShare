@@ -25,9 +25,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
-import com.example.quickshare.CONSTANTS;
-import com.example.quickshare.MainActivity;
+import com.example.quickshare.homePage.HomePageActivity;
 import com.example.quickshare.R;
+import com.example.quickshare.Utils.CONSTANTS;
 
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -70,7 +70,8 @@ public class RecipientFragment extends Fragment {
             public void handleMessage(@NonNull Message msg) {
                 FragmentActivity activity = getActivity();
                 switch (msg.what) {
-                    case CONSTANTS.MessageConstants.MESSAGE_READ:
+                    case CONSTANTS.MessageConstants.FINISHED:
+                        //TODO: TTS
                         byte[] readBuf = (byte[]) msg.obj;
                         handleReceivedFileData(readBuf);
                         break;
@@ -112,7 +113,7 @@ public class RecipientFragment extends Fragment {
 
         cancelButton.setOnClickListener(view1 -> {
 //            handleReceivedFileData(data);
-                Intent intent = new Intent(requireActivity(), MainActivity.class);
+                Intent intent = new Intent(requireActivity(), HomePageActivity.class);
                 startActivity(intent);
         });
 
@@ -132,7 +133,7 @@ public class RecipientFragment extends Fragment {
                 if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
                 }
-                tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(CONSTANTS.NAME, CONSTANTS.MY_UUID);
+                tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(CONSTANTS.misc.NAME, CONSTANTS.misc.MY_UUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -201,7 +202,7 @@ public class RecipientFragment extends Fragment {
         try (OutputStream outputStream = new FileOutputStream(receivedFile)) {
             outputStream.write(data);
             // File saved successfully, show a message or perform any necessary action
-            Toast.makeText(requireContext(), "File saved successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "File saved successfully at " + receivedFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
             // Handle file saving failure
