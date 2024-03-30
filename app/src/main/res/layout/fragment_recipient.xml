@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- activity_recipient.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
-
 
     <TextView
         android:id="@+id/textStatus"
@@ -17,21 +15,23 @@
         android:visibility="visible"/>
 
     <TextView
-        android:layout_marginTop="30dp"
         android:id="@+id/textFileSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="32 mb"
         android:visibility="gone"
-        android:textSize="25dp" />
+        android:textSize="25dp"
+        android:layout_marginTop="30dp"
+        android:layout_below="@id/textStatus" />
 
     <ProgressBar
-        android:layout_marginTop="200dp"
         android:id="@+id/progressBar"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:layout_below="@id/textFileSize"
+        android:layout_marginTop="20dp" />
 
     <!-- Cancel Button -->
     <Button
@@ -39,8 +39,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cancel"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="8dp" />
-</LinearLayout>
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="visible" />
+</RelativeLayout>

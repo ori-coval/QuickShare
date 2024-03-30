@@ -6,7 +6,7 @@ public class CONSTANTS {
 
     public interface DBConstants {
         String DB_NAME = "shared_files.db";
-        int DB_VERSION = 1;
+        int DB_VERSION = 3;
         String TABLE_NAME = "shared_files_table";
 
         String COL_FILE_PATH = "FILE_PATH";
@@ -20,7 +20,9 @@ public class CONSTANTS {
     public interface misc {
         int SEND_FILE_POSE = 0;
         int RECEIVE_FILE_POSE = 1;
-        UUID MY_UUID = UUID.fromString("totally and absolutely random UUID for my bluetooth file sharing app");
+
+        //a UUID that was hashed from "totally and absolutely random UUID for my bluetooth file sharing app"
+        UUID MY_UUID = UUID.fromString("4120b109-97c9-13c7-8d36-27d1c3a7a732");
         String NAME = "Quick share";
     }
 

@@ -56,14 +56,27 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="1. Click 'Send File' to start sharing."
+        android:text="Click 'Send File' to start sharing."
         android:textSize="14sp" />
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="2. Click 'receive Files' to receive a file."
+        android:text="Click 'receive Files' to receive a file."
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="if you have shared a file, Click 'share again'"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="to share it again or 'Delete' if you wish delete it."
         android:textSize="14sp" />
 
 
@@ -71,7 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_marginTop="100dp">
+        android:layout_marginTop="70dp">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/send_file_button"
             style="@style/rounded_button_peach"

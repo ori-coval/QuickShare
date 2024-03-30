@@ -45,7 +45,8 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
     @Override
     public void onBindViewHolder(@NonNull SharedFileViewHolder holder, int position) {
         SharedFile sharedFile = sharedFiles.get(position);
-        holder.textFileName.setText(sharedFile.getFilePath());
+        String filePath = sharedFile.getFilePath();
+        holder.textFileName.setText(filePath.substring(filePath.lastIndexOf("/") + 1));
         holder.textFileType.setText(sharedFile.getFileType());
         holder.textDate.setText(sharedFile.getDate());
         holder.textFileSize.setText(sharedFile.getFileSize()+" MB");
@@ -67,8 +68,6 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
             sendFileIntent.putExtra("file_path", sharedFile.getFilePath());
             sendFileIntent.putExtra("file_type", sharedFile.getFileType());
             sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
-            byte[] fileData = sharedFile.getFileData();
-            sendFileIntent.putExtra("file_data", fileData);
             sendFileIntent.putExtra("file_data", sharedFile.getFileData());
             startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
         });

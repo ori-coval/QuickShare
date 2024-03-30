@@ -86,7 +86,6 @@ public class FileSharingFragment extends Fragment {
         Button sendFileButton = view.findViewById(R.id.send_file_button);
         Button cancelButton = view.findViewById(R.id.cancel_button);
         selectedFileInfo = view.findViewById(R.id.TV_file_info);
-        ProgressBar progressBar = view.findViewById(R.id.progress_bar);
 
         // Set initial file info
         if(hasFile) {
@@ -101,11 +100,9 @@ public class FileSharingFragment extends Fragment {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.what == CONSTANTS.MessageConstants.FINISHED) {
-                    progressBar.setVisibility(View.GONE);
                 }
 
                 if (msg.what == CONSTANTS.MessageConstants.STARTED) {
-                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -162,7 +159,6 @@ public class FileSharingFragment extends Fragment {
             if (socket != null && socket.isConnected()) {
                 if(hasFile){
                     connectedThread=new ConnectedThread(socket,handler);
-                    progressBar.setVisibility(View.VISIBLE);
                     byte[] bytes;
 
                     if(isSendingFile){
@@ -233,8 +229,14 @@ public class FileSharingFragment extends Fragment {
         int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
         returnCursor.moveToFirst();
 
+        if(returnCursor.getDouble(sizeIndex) / 1000000 > 100) {
+            CustomToast.showWithDuration(getContext(), "File too large", 0.5);
+            return;
+        }
+
         filePath = fileUri.getPath();
         fileSize = returnCursor.getInt(sizeIndex);
+
         fileType = requireActivity().getContentResolver().getType(fileUri);
         int index = 0;
         if (fileType != null) {
@@ -248,6 +250,7 @@ public class FileSharingFragment extends Fragment {
 
         selectedFileInfo.setText(fileInfoText);
         returnCursor.close();
+        isSendingFile = false;
     }
 
     private void connectDevice(Intent data) {

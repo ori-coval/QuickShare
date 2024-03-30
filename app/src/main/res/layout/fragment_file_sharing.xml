@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Select File"
+        android:layout_alignParentTop="true"
         android:id="@+id/select_file_button"
         android:layout_marginBottom="16dp" />
 
@@ -20,51 +20,30 @@
         android:id="@+id/TV_file_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/select_file_button"
         android:text="Selected File: [File Name] (Size: [File Size], Type: [File Type])"
         android:layout_marginBottom="16dp" />
 
     <TextView
+        android:id="@+id/find_share_recipient"
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="find share recipient thorough:"
+        android:layout_below="@id/TV_file_info"
+        android:text="find share recipient:"
         android:textSize="20dp"
+        android:layout_gravity="center_horizontal"
         />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="work if nfc not available"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="easier if available"
-            />
-    </LinearLayout>
-
-    <!-- Choose Recipients Buttons -->
-    <LinearLayout
+    <!-- Via Bluetooth Button -->
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
-
-        <!-- Via Bluetooth Button -->
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="connect via Bluetooth"
-            android:id="@+id/via_bluetooth_button"
-            android:layout_marginEnd="8dp" />
-    </LinearLayout>
+        android:layout_weight="1"
+        android:layout_below="@id/find_share_recipient"
+        android:text="connect via Bluetooth"
+        android:id="@+id/via_bluetooth_button"
+        android:layout_marginEnd="8dp" />
 
     <!-- Send File Button -->
     <Button
@@ -72,7 +51,8 @@
         android:layout_height="wrap_content"
         android:text="Send File"
         android:id="@+id/send_file_button"
-        android:layout_marginTop="16dp"
+        android:layout_above="@id/cancel_button"
+        android:layout_marginTop="280dp"
         android:enabled="false" />
 
     <!-- Cancel Button -->
@@ -80,15 +60,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cancel"
+        android:layout_alignParentBottom="true"
         android:id="@+id/cancel_button"
         android:layout_marginTop="8dp" />
 
-    <!-- Progress Bar -->
-    <ProgressBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/progress_bar"
-        android:layout_marginTop="16dp"
-        android:visibility="invisible" />
 
-</LinearLayout>
+</RelativeLayout>

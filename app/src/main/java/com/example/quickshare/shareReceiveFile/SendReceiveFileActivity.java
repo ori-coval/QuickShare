@@ -42,7 +42,11 @@ public class SendReceiveFileActivity extends AppCompatActivity {
 
         FileSharingFragment fileSharingFragment;
 
-        if(getIntent().getStringExtra("file_path")!=null && getIntent().getStringExtra("file_type")!=null && getIntent().getStringExtra("file_size")!=null && getIntent().getStringExtra("file_uri")!=null) {
+        if(getIntent().getStringExtra("file_path")!=null
+                && getIntent().getStringExtra("file_type")!=null
+                && getIntent().getStringExtra("file_size")!=null
+                && getIntent().getByteArrayExtra("file_data")!=null) {
+
             String tmpFileSize = getIntent().getStringExtra("file_size");
             int fileSize = 0;
             if(tmpFileSize != null) {
@@ -54,13 +58,12 @@ public class SendReceiveFileActivity extends AppCompatActivity {
                 }
             }
 
-            String tmpFileUri = getIntent().getStringExtra("fileData");
 
             fileSharingFragment = new FileSharingFragment(
                     getIntent().getStringExtra("file_path"),
                     getIntent().getStringExtra("file_type"),
                     fileSize,
-                    (byte[])getIntent().getExtras().get("file_data"));
+                    getIntent().getByteArrayExtra("file_data"));
         }
         else {
             fileSharingFragment = new FileSharingFragment();
@@ -100,6 +103,9 @@ public class SendReceiveFileActivity extends AppCompatActivity {
     public void ensureDiscoverable() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 33);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 33);
         }
         if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
