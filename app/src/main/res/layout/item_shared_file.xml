@@ -29,11 +29,13 @@
             android:maxLines="1"
             android:text="file size" />
 
-        <Button
+        <ImageButton
             android:id="@+id/deleteButton"
             android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="Delete" />
+            android:layout_height="50dp"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            android:src="@drawable/trash_can"/>
 
     </LinearLayout>
 
@@ -60,11 +62,13 @@
             android:maxLines="1"
             android:text="Date" />
 
-        <Button
+        <ImageButton
             android:id="@+id/shareAgainButton"
             android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="Share Again" />
+            android:layout_height="50dp"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            android:src="@drawable/share_blue"/>
 
     </LinearLayout>
 

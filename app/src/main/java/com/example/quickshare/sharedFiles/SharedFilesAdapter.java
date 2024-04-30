@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -81,7 +82,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
 
     public static class SharedFileViewHolder extends RecyclerView.ViewHolder {
         public TextView textFileName, textFileType, textFileSize, textDate;
-        public Button deleteButton, shareAgainButton;
+        public ImageButton deleteButton, shareAgainButton;
 
         public SharedFileViewHolder(View itemView) {
             super(itemView);

@@ -1,109 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/LightGray"
+    android:background="@color/white"
     android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:id="@+id/appName">
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <!-- App Title -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Quick"
-                    android:textColor="@color/blue_primary"
-                    android:textSize="28sp"
-                    android:textStyle="bold"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Share"
-                    android:textColor="@color/peach"
-                    android:textSize="28sp"
-                    android:textStyle="bold"/>
-
-            </LinearLayout>
-
+            android:layout_height="wrap_content">
             <!-- App Title -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="Nearby File Sharing"
-                android:textSize="18sp"
+                android:text="Quick"
+                android:textColor="@color/peach"
+                android:textSize="28sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share"
+                android:textColor="@color/peach"
+                android:textSize="28sp"
                 android:textStyle="bold"/>
 
         </LinearLayout>
 
+        <!-- App Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Nearby File Sharing"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
-    <!-- How to Use Section -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="How to Use:"
-        android:textSize="16sp"
-        android:layout_marginTop="24dp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click 'Send File' to start sharing."
-        android:textSize="14sp" />
+    </LinearLayout>
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Click 'receive Files' to receive a file."
-        android:textSize="14sp" />
-
-    <TextView
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="if you have shared a file, Click 'share again'"
-        android:textSize="14sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="to share it again or 'Delete' if you wish delete it."
-        android:textSize="14sp" />
 
 
     <LinearLayout
+        android:id="@+id/shareReceive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_marginTop="70dp">
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/send_file_button"
-            style="@style/rounded_button_peach"
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginRight="18dp"
-            android:text="Send"
-            android:onClick="onClick"/>
+        android:layout_below="@id/appName"
+        android:layout_marginTop="150dp">
 
-        <com.google.android.material.button.MaterialButton
+        <ImageButton
             android:id="@+id/receive_file_button"
-            style="@style/rounded_button_blue"
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="32dp"
-            android:text="Receive"
-            android:onClick="onClick"/>
+            android:layout_width="40dp"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_launcher" />
+
+        <ImageButton
+            android:id="@+id/send_file_button"
+            android:layout_width="40dp"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:src="@drawable/paper_plane" />
     </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/shareReceiveText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/shareReceive">
+
+        <TextView
+            android:id="@+id/textView"
+            android:textSize="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="receive file"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:textSize="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="share file"
+            android:gravity="center"/>
+    </LinearLayout>
+
     <!-- Title -->
     <TextView
         android:id="@+id/textTitle"
@@ -113,13 +112,15 @@
         android:gravity="center"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:layout_marginTop="50dp"
+        android:layout_below="@id/shareReceiveText"/>
 
     <!-- RecyclerView for Shared Files -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/shared_files_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/textTitle" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textTitle"/>
 
-</LinearLayout>
+</RelativeLayout>
