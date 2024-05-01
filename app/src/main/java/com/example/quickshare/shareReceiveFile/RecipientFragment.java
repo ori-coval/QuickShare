@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
+import com.example.quickshare.Utils.CustomToast;
 import com.example.quickshare.homePage.HomePageActivity;
 import com.example.quickshare.R;
 import com.example.quickshare.Utils.CONSTANTS;
@@ -82,6 +83,7 @@ public class RecipientFragment extends Fragment {
                         fileSizeTextView.setVisibility(View.VISIBLE);
                         fileSizeTextView.setText("File Size: " + fileSize + " MB");
                         textStatus.setVisibility(View.GONE);
+                        break;
 
                     case CONSTANTS.MessageConstants.MESSAGE_PROGRESS:
                         int progress = 0;
@@ -92,6 +94,19 @@ public class RecipientFragment extends Fragment {
                             e.printStackTrace();
                         }
                         progressBar.setProgress(progress);
+                        break;
+
+                    case CONSTANTS.MessageConstants.MESSAGE_CONNECTED:
+                        CustomToast.showWithDuration(activity, "Connected", Toast.LENGTH_SHORT);
+                        break;
+
+                    case CONSTANTS.MessageConstants.MESSAGE_DISCONNECTED:
+                        CustomToast.showWithDuration(activity, "Disconnected", Toast.LENGTH_SHORT);
+                        break;
+
+                    case CONSTANTS.MessageConstants.MESSAGE_FAILED:
+                        CustomToast.showWithDuration(activity, "Connection Failed", Toast.LENGTH_SHORT);
+                        break;
                 }
             }
         };

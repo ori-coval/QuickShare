@@ -30,6 +30,9 @@ public class CONSTANTS {
         String MESSAGE_TOAST = "TOAST";
         int MESSAGE_PROGRESS = 564564;
         int MESSAGE_READ_FILE_SIZE = 89315;
+        int MESSAGE_CONNECTED = 10848;
+        int MESSAGE_DISCONNECTED = 9453;
+        int MESSAGE_FAILED = 2367;
         int FINISHED = 4891854;
         int STARTED = 88824564;
     }

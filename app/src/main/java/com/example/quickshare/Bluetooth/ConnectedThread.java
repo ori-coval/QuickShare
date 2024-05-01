@@ -21,9 +21,9 @@ public class ConnectedThread extends Thread {
     private final OutputStream mmOutStream;
     private Handler handler;
     private byte[] mmBuffer; // mmBuffer store for the stream
-
-    // Define a constant for acknowledgment message
-    private static final byte ACKNOWLEDGMENT = 1;
+    private Boolean connected = false;
+    Message failedToConnectMsg = handler.obtainMessage(
+            CONSTANTS.MessageConstants.MESSAGE_FAILED);
 
     /**
      * @param socket  an already connected BluetoothSocket on which the connection was made.
@@ -43,24 +43,17 @@ public class ConnectedThread extends Thread {
             tmpIn = socket.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
+            failedToConnectMsg.sendToTarget();
         }
         try {
             tmpOut = socket.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
+            failedToConnectMsg.sendToTarget();
         }
 
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
-    }
-
-    // Method to send acknowledgment message
-    private void sendAcknowledgment() {
-        try {
-            mmOutStream.write(ACKNOWLEDGMENT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private int expectedBytes = -1; // Track expected bytes
@@ -70,6 +63,12 @@ public class ConnectedThread extends Thread {
         int numBytes; // bytes returned from read()
 
         ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream(); // Buffer to collect the entire message
+
+        Message connectedMsg = handler.obtainMessage(
+                CONSTANTS.MessageConstants.MESSAGE_CONNECTED, expectedBytes);
+        connectedMsg.sendToTarget();
+        connected = true;
+
 
         // Keep listening to the InputStream until an exception occurs.
         while (true) {
@@ -86,7 +85,7 @@ public class ConnectedThread extends Thread {
                     expectedBytes = buffer.getInt();
                     receivedBytes = 0; // Reset received bytes count
                     Message fileSizeMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_READ_FILE_SIZE, expectedBytes);
+                            CONSTANTS.MessageConstants.MESSAGE_READ_FILE_SIZE);
                     fileSizeMsg.sendToTarget();
 
                     // Adjust mmBuffer size to read actual data
@@ -116,6 +115,16 @@ public class ConnectedThread extends Thread {
                     messageBuffer.reset();
                 }
             } catch (IOException e) {
+
+                if (!connected) {
+                    Message disconnectedMsg = handler.obtainMessage(
+                            CONSTANTS.MessageConstants.MESSAGE_DISCONNECTED);
+                    disconnectedMsg.sendToTarget();
+                }
+                else {
+                    failedToConnectMsg.sendToTarget();
+                }
+
                 e.printStackTrace();
                 break;
             }
