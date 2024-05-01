@@ -3,24 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/LightGray"
+    android:background="@color/white"
     android:padding="16dp">
 
     <!-- Select File Button -->
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select File"
-        android:layout_alignParentTop="true"
-        android:id="@+id/select_file_button"
-        android:layout_marginBottom="16dp" />
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:id="@+id/file_sharing_layout"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/select_file_button"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            android:src="@drawable/choose_file" />
+
+        <Button
+            android:id="@+id/select_file_text_button"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="choose file"
+            android:background="@android:color/transparent"
+            android:textColor="@color/black"
+            android:fontFamily="@font/albam"
+            android:textSize="30dp"/>
+    </LinearLayout>
 
     <!-- Selected File Info -->
     <TextView
         android:id="@+id/TV_file_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/select_file_button"
+        android:layout_below="@id/file_sharing_layout"
         android:text="Selected File: [File Name] (Size: [File Size], Type: [File Type])"
         android:layout_marginBottom="16dp" />
 

@@ -9,6 +9,10 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -57,6 +62,8 @@ public class FileSharingFragment extends Fragment {
     private DataBaseHelper dataBaseHelper;
     private boolean isSendingFile = false;
     private byte[] fileData;
+    private ImageButton selectFileButton;
+    private Button selectFileTextButton;
 
     public FileSharingFragment() {
 
@@ -81,7 +88,8 @@ public class FileSharingFragment extends Fragment {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Initialize UI elements
-        Button selectFileButton = view.findViewById(R.id.select_file_button);
+        selectFileButton = view.findViewById(R.id.select_file_button);
+        selectFileTextButton = view.findViewById(R.id.select_file_text_button);
         Button viaBluetoothButton = view.findViewById(R.id.via_bluetooth_button);
         Button sendFileButton = view.findViewById(R.id.send_file_button);
         Button cancelButton = view.findViewById(R.id.cancel_button);
@@ -112,6 +120,10 @@ public class FileSharingFragment extends Fragment {
 
         // Set click listeners for buttons
         selectFileButton.setOnClickListener(view1 -> {
+            chooseFile();
+        });
+        // Set click listeners for buttons
+        selectFileTextButton.setOnClickListener(view1 -> {
             chooseFile();
         });
 
@@ -251,6 +263,19 @@ public class FileSharingFragment extends Fragment {
         selectedFileInfo.setText(fileInfoText);
         returnCursor.close();
         isSendingFile = false;
+
+
+        //morphs the button image to the file chosen img
+        TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
+                new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.choose_file)),
+                new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.file_choosen))
+        });
+        transitionDrawable.setCrossFadeEnabled(true);
+        transitionDrawable.startTransition(2000);
+
+        selectFileButton.setImageDrawable(transitionDrawable);
+
+        selectFileTextButton.setText("File Chosen");
     }
 
     private void connectDevice(Intent data) {
