@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -34,10 +33,10 @@ import androidx.fragment.app.Fragment;
 import com.example.quickshare.Bluetooth.ConnectedThread;
 import com.example.quickshare.Bluetooth.DeviceListActivity;
 import com.example.quickshare.DB.DataBaseHelper;
+import com.example.quickshare.Utils.CustomToast;
 import com.example.quickshare.homePage.HomePageActivity;
 import com.example.quickshare.R;
 import com.example.quickshare.Utils.CONSTANTS;
-import com.example.quickshare.Utils.CustomToast;
 import com.example.quickshare.sharedFiles.SharedFile;
 
 import java.io.FileNotFoundException;
@@ -65,6 +64,7 @@ public class FileSharingFragment extends Fragment {
     private ImageButton selectFileButton;
     private Button selectFileTextButton;
 
+    private ConnectingAnimationView connectingAnimationView;
     public FileSharingFragment() {
 
     }
@@ -94,6 +94,7 @@ public class FileSharingFragment extends Fragment {
         Button sendFileButton = view.findViewById(R.id.send_file_button);
         Button cancelButton = view.findViewById(R.id.cancel_button);
         selectedFileInfo = view.findViewById(R.id.TV_file_info);
+        connectingAnimationView = view.findViewById(R.id.connectingAnimationView);
 
         // Set initial file info
         if(hasFile) {
@@ -132,35 +133,48 @@ public class FileSharingFragment extends Fragment {
         bluetoothConnectLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    connectingAnimationView.setVisibility(View.VISIBLE);
+                    connectingAnimationView.startAnimation();
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
-                        CustomToast.showWithDuration(getContext(), "Connecting", 0.5);
-                        for(int i = 0; i <= 5; i++) {
-                            connectDevice(data);
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            if(socket!=null && socket.isConnected())
-                                break;
-                            if(i == 5) {
+                        // Start a new thread for the specific block of code
+                        Thread specificBlockThread = new Thread(() -> {
+                            for(int i = 0; i <= 5; i++) {
+                                connectDevice(data);
                                 try {
-                                    Thread.sleep(1000);
+                                    Thread.sleep(100);
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
                                 }
-                                Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
-                                serverIntent.putExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST, "Connection Failed try again");
-                                bluetoothConnectLauncher.launch(serverIntent);
+                                if(socket != null && socket.isConnected())
+                                    break;
+                                if(i == 5) {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
+                                    serverIntent.putExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST, "Connection Failed try again");
+                                    connectingAnimationView.setVisibility(View.INVISIBLE);
+                                    connectingAnimationView.stopAnimation();
+                                    bluetoothConnectLauncher.launch(serverIntent);
+                                }
                             }
-                        }
-
-                        if(socket!=null && socket.isConnected()){
-                            sendFileButton.setEnabled(hasFile);
-                        }
+                            // Continue executing the rest of the code inside the thread
+                            if(socket != null && socket.isConnected()){
+                                sendFileButton.setEnabled(hasFile);
+                            }
+                        });
+                        // Start the thread
+                        specificBlockThread.start();
+                    }
+                    else {
+                        connectingAnimationView.setVisibility(View.INVISIBLE);
+                        connectingAnimationView.stopAnimation();
                     }
                 });
+
 
         viaBluetoothButton.setOnClickListener(view12 -> {
             Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);

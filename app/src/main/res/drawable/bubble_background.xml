@@ -1,0 +1,6 @@
+<!-- bubble_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#b8b6ff" /> <!-- Change color as desired -->
+    <corners android:radius="20dp" /> <!-- Adjust radius for corner roundness -->
+</shape>

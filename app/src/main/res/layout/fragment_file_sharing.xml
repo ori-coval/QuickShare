@@ -36,6 +36,12 @@
             android:textSize="30dp"/>
     </LinearLayout>
 
+    <com.example.quickshare.shareReceiveFile.ConnectingAnimationView
+        android:id="@+id/connectingAnimationView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/via_bluetooth_button"/>
+
     <!-- Selected File Info -->
     <TextView
         android:id="@+id/TV_file_info"

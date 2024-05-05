@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -54,13 +55,14 @@ public class RecipientFragment extends Fragment {
     private Handler handler;
     private int fileSize;
     private ProgressBar progressBar;
-
+    private AlertDialog.Builder builder;
     byte[] data;
     @SuppressLint("HandlerLeak")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipient, container, false);
 
+        builder = new AlertDialog.Builder(requireActivity());
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Button cancelButton = view.findViewById(R.id.cancel_button);
         fileSizeTextView = view.findViewById(R.id.textFileSize);
@@ -97,7 +99,10 @@ public class RecipientFragment extends Fragment {
                         break;
 
                     case CONSTANTS.MessageConstants.MESSAGE_CONNECTED:
-                        CustomToast.showWithDuration(activity, "Connected", Toast.LENGTH_SHORT);
+                        builder.setMessage("")
+                                .setTitle("Connected");
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
                         break;
 
                     case CONSTANTS.MessageConstants.MESSAGE_DISCONNECTED:
