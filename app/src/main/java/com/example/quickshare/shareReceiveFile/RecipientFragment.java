@@ -72,6 +72,7 @@ public class RecipientFragment extends Fragment {
         handler = new Handler() {
             public void handleMessage(@NonNull Message msg) {
                 FragmentActivity activity = getActivity();
+                AlertDialog dialog;
                 switch (msg.what) {
                     case CONSTANTS.MessageConstants.FINISHED:
                         //TODO: TTS
@@ -99,18 +100,10 @@ public class RecipientFragment extends Fragment {
                         break;
 
                     case CONSTANTS.MessageConstants.MESSAGE_CONNECTED:
-                        builder.setMessage("")
-                                .setTitle("Connected");
-                        AlertDialog dialog = builder.create();
+                        builder.setMessage("Connection Established")
+                                .setTitle("");
+                        dialog = builder.create();
                         dialog.show();
-                        break;
-
-                    case CONSTANTS.MessageConstants.MESSAGE_DISCONNECTED:
-                        CustomToast.showWithDuration(activity, "Disconnected", Toast.LENGTH_SHORT);
-                        break;
-
-                    case CONSTANTS.MessageConstants.MESSAGE_FAILED:
-                        CustomToast.showWithDuration(activity, "Connection Failed", Toast.LENGTH_SHORT);
                         break;
                 }
             }
@@ -222,7 +215,9 @@ public class RecipientFragment extends Fragment {
         try (OutputStream outputStream = new FileOutputStream(receivedFile)) {
             outputStream.write(data);
             // File saved successfully, show a message or perform any necessary action
-            Toast.makeText(requireContext(), "File saved successfully at " + receivedFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            builder.setMessage("File saved successfully at " + receivedFile.toPath()).create();
+            AlertDialog dialog = builder.create();
+            dialog.show();
         } catch (IOException e) {
             e.printStackTrace();
             // Handle file saving failure

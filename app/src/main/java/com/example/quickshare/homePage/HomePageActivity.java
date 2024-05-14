@@ -38,23 +38,6 @@ public class HomePageActivity extends AppCompatActivity implements View.OnClickL
             SharedFilesAdapter adapter = new SharedFilesAdapter(sharedFiles, this);
             recyclerView.setAdapter(adapter);
         }
-
-        String filePath1 = "/path/to/test/file1.txt";
-        String filePath2 = "/path/to/test/file2.txt";
-        String filePath3 = "/path/to/test/file3.txt";
-
-        String fileType = "txt";
-        String date = "2024-04-30"; // Assuming the date format matches your database schema
-        int fileSize = 1024; // Example file size in bytes
-        byte[] fileData = "Test file data".getBytes(); // Example file data
-
-        SharedFile file1 = new SharedFile(filePath1, fileType, date, fileSize, fileData);
-        SharedFile file2 = new SharedFile(filePath2, fileType, date, fileSize, fileData);
-        SharedFile file3 = new SharedFile(filePath3, fileType, date, fileSize, fileData);
-
-        dataBaseHelper.insertSharedFile(file1);
-        dataBaseHelper.insertSharedFile(file2);
-        dataBaseHelper.insertSharedFile(file3);
     }
 
     @Override

@@ -21,9 +21,6 @@ public class ConnectedThread extends Thread {
     private final OutputStream mmOutStream;
     private Handler handler;
     private byte[] mmBuffer; // mmBuffer store for the stream
-    private Boolean connected = false;
-    Message failedToConnectMsg = handler.obtainMessage(
-            CONSTANTS.MessageConstants.MESSAGE_FAILED);
 
     /**
      * @param socket  an already connected BluetoothSocket on which the connection was made.
@@ -43,13 +40,11 @@ public class ConnectedThread extends Thread {
             tmpIn = socket.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
-            failedToConnectMsg.sendToTarget();
         }
         try {
             tmpOut = socket.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
-            failedToConnectMsg.sendToTarget();
         }
 
         mmInStream = tmpIn;
@@ -67,7 +62,6 @@ public class ConnectedThread extends Thread {
         Message connectedMsg = handler.obtainMessage(
                 CONSTANTS.MessageConstants.MESSAGE_CONNECTED, expectedBytes);
         connectedMsg.sendToTarget();
-        connected = true;
 
 
         // Keep listening to the InputStream until an exception occurs.
@@ -86,6 +80,7 @@ public class ConnectedThread extends Thread {
                     receivedBytes = 0; // Reset received bytes count
                     Message fileSizeMsg = handler.obtainMessage(
                             CONSTANTS.MessageConstants.MESSAGE_READ_FILE_SIZE);
+                    fileSizeMsg.obj = expectedBytes;
                     fileSizeMsg.sendToTarget();
 
                     // Adjust mmBuffer size to read actual data
@@ -115,15 +110,6 @@ public class ConnectedThread extends Thread {
                     messageBuffer.reset();
                 }
             } catch (IOException e) {
-
-                if (!connected) {
-                    Message disconnectedMsg = handler.obtainMessage(
-                            CONSTANTS.MessageConstants.MESSAGE_DISCONNECTED);
-                    disconnectedMsg.sendToTarget();
-                }
-                else {
-                    failedToConnectMsg.sendToTarget();
-                }
 
                 e.printStackTrace();
                 break;

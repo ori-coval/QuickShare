@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -63,8 +64,10 @@ public class FileSharingFragment extends Fragment {
     private byte[] fileData;
     private ImageButton selectFileButton;
     private Button selectFileTextButton;
-
+    private Button sendFileButton;
     private ConnectingAnimationView connectingAnimationView;
+    private AlertDialog.Builder builder;
+
     public FileSharingFragment() {
 
     }
@@ -83,6 +86,8 @@ public class FileSharingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_file_sharing, container, false);
 
+        builder = new AlertDialog.Builder(requireActivity());
+
         dataBaseHelper = new DataBaseHelper(requireActivity());
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -91,7 +96,7 @@ public class FileSharingFragment extends Fragment {
         selectFileButton = view.findViewById(R.id.select_file_button);
         selectFileTextButton = view.findViewById(R.id.select_file_text_button);
         Button viaBluetoothButton = view.findViewById(R.id.via_bluetooth_button);
-        Button sendFileButton = view.findViewById(R.id.send_file_button);
+        sendFileButton = view.findViewById(R.id.send_file_button);
         Button cancelButton = view.findViewById(R.id.cancel_button);
         selectedFileInfo = view.findViewById(R.id.TV_file_info);
         connectingAnimationView = view.findViewById(R.id.connectingAnimationView);
@@ -138,11 +143,11 @@ public class FileSharingFragment extends Fragment {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         // Start a new thread for the specific block of code
-                        Thread specificBlockThread = new Thread(() -> {
+                        Thread establishConnectionThread = new Thread(() -> {
                             for(int i = 0; i <= 5; i++) {
                                 connectDevice(data);
                                 try {
-                                    Thread.sleep(100);
+                                    Thread.sleep(500);
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -161,13 +166,19 @@ public class FileSharingFragment extends Fragment {
                                     bluetoothConnectLauncher.launch(serverIntent);
                                 }
                             }
-                            // Continue executing the rest of the code inside the thread
-                            if(socket != null && socket.isConnected()){
-                                sendFileButton.setEnabled(hasFile);
-                            }
+                            
+                            handler.post(() ->{
+                                if(socket != null && socket.isConnected()){
+                                    sendFileButton.setEnabled(hasFile);
+                                }
+                                connectingAnimationView.setVisibility(View.INVISIBLE);
+                                builder.setMessage("Connection Established").setTitle("");
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            });
                         });
                         // Start the thread
-                        specificBlockThread.start();
+                        establishConnectionThread.start();
                     }
                     else {
                         connectingAnimationView.setVisibility(View.INVISIBLE);
