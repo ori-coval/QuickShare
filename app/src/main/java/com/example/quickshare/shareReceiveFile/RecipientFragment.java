@@ -51,7 +51,7 @@ public class RecipientFragment extends Fragment {
 
     private BluetoothAdapter bluetoothAdapter;
     private AcceptThread acceptThread;
-    private TextView fileSizeTextView, textStatus;
+    private TextView fileSizeTextView;
     private Handler handler;
     private int fileSize;
     private ProgressBar progressBar;
@@ -66,16 +66,14 @@ public class RecipientFragment extends Fragment {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Button cancelButton = view.findViewById(R.id.cancel_button);
         fileSizeTextView = view.findViewById(R.id.textFileSize);
-        textStatus = view.findViewById(R.id.textStatus);
         progressBar = view.findViewById(R.id.progressBar);
 
-        handler = new Handler() {
+        handler = new Handler(requireActivity().getMainLooper()) {// TODO test
             public void handleMessage(@NonNull Message msg) {
                 FragmentActivity activity = getActivity();
                 AlertDialog dialog;
                 switch (msg.what) {
                     case CONSTANTS.MessageConstants.FINISHED:
-                        //TODO: TTS
                         byte[] readBuf = (byte[]) msg.obj;
                         handleReceivedFileData(readBuf);
                         break;
@@ -85,7 +83,6 @@ public class RecipientFragment extends Fragment {
                         progressBar.setVisibility(View.VISIBLE);
                         fileSizeTextView.setVisibility(View.VISIBLE);
                         fileSizeTextView.setText("File Size: " + fileSize + " MB");
-                        textStatus.setVisibility(View.GONE);
                         break;
 
                     case CONSTANTS.MessageConstants.MESSAGE_PROGRESS:
@@ -228,7 +225,7 @@ public class RecipientFragment extends Fragment {
         try (InputStream stream = new ByteArrayInputStream(fileBytes)) {
             Detector detector = new AutoDetectParser().getDetector();
             Metadata metadata = new Metadata();
-            metadata.set(Metadata.RESOURCE_NAME_KEY, "filename"); // You can set the filename here if available
+            metadata.set(Metadata.RESOURCE_NAME_KEY, "filename");
 
             MediaType mediaType = detector.detect(TikaInputStream.get(stream), metadata);
             return mediaType.getSubtype(); // Get only the subtype

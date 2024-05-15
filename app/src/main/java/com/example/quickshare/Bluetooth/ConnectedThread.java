@@ -1,5 +1,8 @@
 package com.example.quickshare.Bluetooth;
 
+import static com.example.quickshare.Utils.CONSTANTS.MessageConstants.END_SEQUENCE;
+import static com.example.quickshare.Utils.CONSTANTS.MessageConstants.START_LENGTH_SEQUENCE;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
@@ -15,12 +18,12 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class ConnectedThread extends Thread {
-    private static final int ACKNOWLEDGMENT_TIMEOUT = 3000;
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
-    private Handler handler;
-    private byte[] mmBuffer; // mmBuffer store for the stream
+    private final Handler handler;
+    private int expectedBytes = -1; // Track expected bytes
+    private int receivedBytes = 0; // Track received bytes]
 
     /**
      * @param socket  an already connected BluetoothSocket on which the connection was made.
@@ -37,6 +40,7 @@ public class ConnectedThread extends Thread {
         // Get the input and output streams; using temp objects because
         // member streams are final.
         try {
+            assert socket != null;
             tmpIn = socket.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,10 +55,9 @@ public class ConnectedThread extends Thread {
         mmOutStream = tmpOut;
     }
 
-    private int expectedBytes = -1; // Track expected bytes
-    private int receivedBytes = 0; // Track received bytes]
     public void run() {
-        mmBuffer = new byte[1024*1024];
+        // mmBuffer store for the stream
+        byte[] mmBuffer = new byte[1024 * 1024];
         int numBytes; // bytes returned from read()
 
         ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream(); // Buffer to collect the entire message
@@ -73,7 +76,7 @@ public class ConnectedThread extends Thread {
 
                 // Check if expectedBytes is not set yet
                 // Check if start sequence for length is received
-                if (startsWith(mmBuffer, START_LENGTH_SEQUENCE)) {
+                if (startsWith(mmBuffer)) {
                     // Extract length information
                     ByteBuffer buffer = ByteBuffer.wrap(mmBuffer, START_LENGTH_SEQUENCE.length, 4);
                     expectedBytes = buffer.getInt();
@@ -123,7 +126,7 @@ public class ConnectedThread extends Thread {
         byte[] endOfTransmissionSequence = END_SEQUENCE; // Example sequence: \r\n\r\n
 
         // Check if the buffer contains the end of transmission sequence
-        int sequenceIndex = 0; // Index to track the position within the end of transmission sequence
+        int sequenceIndex = 0; // Index t.o track the position within the end of transmission sequence
         for (byte b : buffer) {
             if (b == endOfTransmissionSequence[sequenceIndex]) {
                 sequenceIndex++; // Move to the next byte in the sequence
@@ -139,13 +142,13 @@ public class ConnectedThread extends Thread {
 
 
     // Method to check if a byte array starts with a specific sequence
-    private boolean startsWith(byte[] array, byte[] sequence) {
-        if (array.length < sequence.length) {
+    private boolean startsWith(byte[] array) {
+        if (array.length < CONSTANTS.MessageConstants.START_LENGTH_SEQUENCE.length) {
             return false;
         }
 
-        for (int i = 0; i < sequence.length; i++) {
-            if (array[i] != sequence[i]) {
+        for (int i = 0; i < CONSTANTS.MessageConstants.START_LENGTH_SEQUENCE.length; i++) {
+            if (array[i] != CONSTANTS.MessageConstants.START_LENGTH_SEQUENCE[i]) {
                 return false;
             }
         }
@@ -153,13 +156,8 @@ public class ConnectedThread extends Thread {
         return true;
     }
 
-    private static final byte[] START_LENGTH_SEQUENCE = {0x01, 0x02, 0x03, 0x04}; // Example start sequence for length
-    private static final byte[] START_FILE_TYPE_SEQUENCE = {0x05, 0x06, 0x07, 0x08}; // Example start sequence for file type
-    private static final byte[] START_DATA_SEQUENCE = {0x09, 0x0A, 0x0B, 0x0C}; // Example start sequence for data
-    private static final byte[] END_SEQUENCE = {0x0D, 0x0E, 0x0F, 0x10}; // Example end sequence
-
     // Method to write data to the output stream
-    public void write(byte[] bytes, String fileType, int fileSize, Activity activity) {
+    public void write(byte[] bytes, Activity activity) {
         try {
 
 

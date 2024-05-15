@@ -2,7 +2,6 @@ package com.example.quickshare.shareReceiveFile;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -10,19 +9,24 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.appcompat.content.res.AppCompatResources;
+
 import com.example.quickshare.R;
 
 public class ConnectingAnimationView extends View {
     private String connectingText = "Connecting";
     private int dotCount = 0;
-    private Handler handler = new Handler();
+    private final Handler handler;
     private boolean isAnimating = false;
-    private Drawable bubbleBackground;
+    private final Drawable bubbleBackground;
 
     public ConnectingAnimationView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        handler = new Handler(context.getMainLooper());
+
         // Load the bubble background drawable
-        bubbleBackground = context.getResources().getDrawable(R.drawable.bubble_background);
+        bubbleBackground =  AppCompatResources.getDrawable(context, R.drawable.bubble_background);//TODO test
     }
 
     public void startAnimation() {

@@ -33,11 +33,14 @@ public class HomePageActivity extends AppCompatActivity implements View.OnClickL
         RecyclerView recyclerView = findViewById(R.id.shared_files_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         List<SharedFile> sharedFiles = null;
+
+
         if (!dataBaseHelper.checkIfDataBaseEmpty()) {
             sharedFiles = dataBaseHelper.getAllSharedFilesList();
             SharedFilesAdapter adapter = new SharedFilesAdapter(sharedFiles, this);
             recyclerView.setAdapter(adapter);
         }
+
     }
 
     @Override

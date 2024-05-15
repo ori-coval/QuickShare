@@ -27,9 +27,11 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.example.quickshare.Bluetooth.ConnectedThread;
 import com.example.quickshare.Bluetooth.DeviceListActivity;
@@ -60,7 +62,7 @@ public class FileSharingFragment extends Fragment {
     private SharedFile sharedFile;
     private String fileInfoText;
     private DataBaseHelper dataBaseHelper;
-    private boolean isSendingFile = false;
+    private boolean isResendingFile = false;
     private byte[] fileData;
     private ImageButton selectFileButton;
     private Button selectFileTextButton;
@@ -104,19 +106,24 @@ public class FileSharingFragment extends Fragment {
         // Set initial file info
         if(hasFile) {
             selectedFileInfo.setText(fileInfoText);
+            selectFileButton.setImageResource(R.drawable.file_choosen);
         }
 
         if(fileData != null) {
-            isSendingFile = true;
+            isResendingFile = true;
         }
 
         Handler handler = new Handler(requireActivity().getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                if (msg.what == CONSTANTS.MessageConstants.FINISHED) {
-                }
-
-                if (msg.what == CONSTANTS.MessageConstants.STARTED) {
+            public void handleMessage(@NonNull Message msg) {
+                FragmentActivity activity = getActivity();
+                AlertDialog dialog;
+                switch (msg.what) {
+                    case CONSTANTS.MessageConstants.FINISHED:
+                        builder.setMessage("filed sent successfully")
+                                .setTitle("");
+                        dialog = builder.create();
+                        dialog.show();
+                        break;
                 }
             }
         };
@@ -159,6 +166,8 @@ public class FileSharingFragment extends Fragment {
                                     } catch (InterruptedException e) {
                                         throw new RuntimeException(e);
                                     }
+                                    if(socket != null && socket.isConnected())
+                                        break;
                                     Intent serverIntent = new Intent(requireActivity(), DeviceListActivity.class);
                                     serverIntent.putExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST, "Connection Failed try again");
                                     connectingAnimationView.setVisibility(View.INVISIBLE);
@@ -198,7 +207,7 @@ public class FileSharingFragment extends Fragment {
                     connectedThread=new ConnectedThread(socket,handler);
                     byte[] bytes;
 
-                    if(isSendingFile){
+                    if(isResendingFile){
                         bytes = this.fileData;
                     }
                     else {
@@ -218,7 +227,7 @@ public class FileSharingFragment extends Fragment {
                     }
 
                     sharedFile = new SharedFile(filePath, fileType, LocalDate.now().toString(), fileSize, bytes);
-                    connectedThread.write(bytes,fileType, fileSize, requireActivity());
+                    connectedThread.write(bytes, requireActivity());
                     dataBaseHelper.insertSharedFile(sharedFile);
 
                 }
@@ -287,7 +296,7 @@ public class FileSharingFragment extends Fragment {
 
         selectedFileInfo.setText(fileInfoText);
         returnCursor.close();
-        isSendingFile = false;
+        isResendingFile = false;
 
 
         //morphs the button image to the file chosen img
@@ -308,7 +317,7 @@ public class FileSharingFragment extends Fragment {
         if (extras == null) {
             return;
         }
-        String address = extras.getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        String address = extras.getString(CONSTANTS.misc.EXTRA_DEVICE_ADDRESS);
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
         connect(device);
     }

@@ -51,15 +51,6 @@ import java.util.Set;
  */
 public class DeviceListActivity extends Activity {
 
-    /**
-     * Tag for Log
-     */
-    private static final String TAG = "DeviceListActivity";
-
-    /**
-     * Return Intent extra
-     */
-    public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
     /**
      * Member fields
@@ -71,8 +62,6 @@ public class DeviceListActivity extends Activity {
      */
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
 
-
-    private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +128,6 @@ public class DeviceListActivity extends Activity {
 
         if(getIntent().getStringExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST) != null){
             CustomToast.showWithDuration(this, getIntent().getStringExtra(CONSTANTS.MessageConstants.MESSAGE_TOAST), 2);
-            //TODO: TTS
         }
     }
 
@@ -194,7 +182,7 @@ public class DeviceListActivity extends Activity {
 
             // Create the result Intent and include the MAC address
             Intent intent = new Intent();
-            intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+            intent.putExtra(CONSTANTS.misc.EXTRA_DEVICE_ADDRESS, address);
 
             // Set result and finish this Activity
             setResult(Activity.RESULT_OK, intent);

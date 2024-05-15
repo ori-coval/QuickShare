@@ -70,7 +70,7 @@ public class SharedFilesAdapter extends RecyclerView.Adapter<SharedFilesAdapter.
             sendFileIntent.putExtra("file_type", sharedFile.getFileType());
             sendFileIntent.putExtra("file_size", sharedFile.getFileSize());
             sendFileIntent.putExtra("file_data", sharedFile.getFileData());
-            startActivity(context, sendFileIntent, null); // Pass the context and sendFileIntent);
+            startActivity(context, sendFileIntent, null);
         });
     }
 
