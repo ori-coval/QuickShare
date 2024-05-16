@@ -26,7 +26,7 @@ public class ConnectingAnimationView extends View {
         handler = new Handler(context.getMainLooper());
 
         // Load the bubble background drawable
-        bubbleBackground =  AppCompatResources.getDrawable(context, R.drawable.bubble_background);//TODO test
+        bubbleBackground =  AppCompatResources.getDrawable(context, R.drawable.bubble_background);
     }
 
     public void startAnimation() {

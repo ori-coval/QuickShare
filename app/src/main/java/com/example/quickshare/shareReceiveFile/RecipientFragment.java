@@ -68,7 +68,7 @@ public class RecipientFragment extends Fragment {
         fileSizeTextView = view.findViewById(R.id.textFileSize);
         progressBar = view.findViewById(R.id.progressBar);
 
-        handler = new Handler(requireActivity().getMainLooper()) {// TODO test
+        handler = new Handler(requireActivity().getMainLooper()) {
             public void handleMessage(@NonNull Message msg) {
                 FragmentActivity activity = getActivity();
                 AlertDialog dialog;
